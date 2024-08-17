@@ -18,20 +18,28 @@ jobs:
         echo "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>
         <rss version=\"2.0\">
           <channel>
-            <title>Your RSS Feed Title</title>
+            <title>Weekly RSS Feed </title>
             <link>http://www.example.com</link>
-            <description>Your RSS Feed Description</description>
+            <description></description>
             <language>en-us</language>
             <lastBuildDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</lastBuildDate>
             <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
             <ttl>1440</ttl>
 
             <item>
-              <title>Weekly Article</title>
-              <link>http://www.example.com/article$(date -u +"%Y%m%d")</link>
-              <description>This is a description of your weekly article.</description>
+              <title>Frankfurter Rundschau Darmstadt</title>
+              <link>https://www.fr.de/rhein-main/darmstadt</link>
+              <description></description>
               <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
-              <guid>http://www.example.com/article$(date -u +"%Y%m%d")</guid>
+              <guid>https://www.fr.de/rhein-main/darmstadt$(date -u +"%Y%m%d")</guid>
+            </item>
+
+            <item>
+              <title>Wikipedia Topics in the News</title>
+              <link>https://en.wikipedia.org/wiki/Portal:Current_events</link>
+              <description></description>
+              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
+              <guid>https://en.wikipedia.org/wiki/Portal:Current_events$(date -u +"%Y%m%d")</guid>
             </item>
 
           </channel>
