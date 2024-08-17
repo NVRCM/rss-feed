@@ -25,21 +25,53 @@ jobs:
             <lastBuildDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</lastBuildDate>
             <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
             <ttl>1440</ttl>
-
+            
             <item>
-              <title>Frankfurter Rundschau Darmstadt</title>
-              <link>https://www.fr.de/rhein-main/darmstadt</link>
+              <title>r/nosurf and other subreddits</title>
+              <link>https://www.reddit.com/r/nosurf/</link>
               <description></description>
               <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
-              <guid>https://www.fr.de/rhein-main/darmstadt$(date -u +"%Y%m%d")</guid>
+              <guid>https://www.reddit.com/r/nosurf/$(date -u +"%Y%m%d")</guid>
             </item>
-
+            
+            <item>
+              <title>Deutschlandfunk Wochenrückblick</title>
+              <link>https://www.ard-text.de/mobil/750</link>
+              <description></description>
+              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
+              <guid>https://www.ard-text.de/mobil/750$(date -u +"%Y%m%d")</guid>
+            </item>
+            
             <item>
               <title>Wikipedia Topics in the News</title>
               <link>https://en.wikipedia.org/wiki/Portal:Current_events</link>
               <description></description>
               <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
               <guid>https://en.wikipedia.org/wiki/Portal:Current_events$(date -u +"%Y%m%d")</guid>
+            </item>
+            
+            <item>
+              <title>Frankfurter Rundschau</title>
+              <link>https://www.fr.de/rhein-main/darmstadt</link>
+              <description></description>
+              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
+              <guid>https://www.fr.de/rhein-main/$(date -u +"%Y%m%d")</guid>
+            </item>
+            
+            <item>
+              <title>MIT Technology Review</title>
+              <link>https://www.technologyreview.com/</link>
+              <description></description>
+              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
+              <guid>https://www.technologyreview.com/$(date -u +"%Y%m%d")</guid>
+            </item>
+
+            <item>
+              <title>Lifehacker (Junk)</title>
+              <link>https://lifehacker.com/</link>
+              <description></description>
+              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
+              <guid>https://lifehacker.com/$(date -u +"%Y%m%d")</guid>
             </item>
 
           </channel>
