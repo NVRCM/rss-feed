@@ -1,20 +1,28 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">
   <channel>
-    <title>Your RSS Feed Title</title>
+    <title>Weekly RSS Feed </title>
     <link>http://www.example.com</link>
-    <description>Your RSS Feed Description</description>
+    <description></description>
     <language>en-us</language>
-    <lastBuildDate>Sat, 17 Aug 2024 12:10:40 GMT</lastBuildDate>
-    <pubDate>Sat, 17 Aug 2024 12:10:40 GMT</pubDate>
+    <lastBuildDate>Sat, 17 Aug 2024 12:24:15 GMT</lastBuildDate>
+    <pubDate>Sat, 17 Aug 2024 12:24:15 GMT</pubDate>
     <ttl>1440</ttl>
 
     <item>
-      <title>Weekly Article</title>
-      <link>http://www.example.com/article20240817</link>
-      <description>This is a description of your weekly article.</description>
-      <pubDate>Sat, 17 Aug 2024 12:10:40 GMT</pubDate>
-      <guid>http://www.example.com/article20240817</guid>
+      <title>Frankfurter Rundschau Darmstadt</title>
+      <link>https://www.fr.de/rhein-main/darmstadt</link>
+      <description></description>
+      <pubDate>Sat, 17 Aug 2024 12:24:15 GMT</pubDate>
+      <guid>https://www.fr.de/rhein-main/darmstadt20240817</guid>
+    </item>
+
+    <item>
+      <title>Wikipedia Topics in the News</title>
+      <link>https://en.wikipedia.org/wiki/Portal:Current_events</link>
+      <description></description>
+      <pubDate>Sat, 17 Aug 2024 12:24:15 GMT</pubDate>
+      <guid>https://en.wikipedia.org/wiki/Portal:Current_events20240817</guid>
     </item>
 
   </channel>
