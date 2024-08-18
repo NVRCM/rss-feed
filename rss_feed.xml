@@ -5,23 +5,23 @@
     <link>http://www.example.com</link>
     <description></description>
     <language>en-us</language>
-    <lastBuildDate>Sun, 18 Aug 2024 02:30:37 GMT</lastBuildDate>
-    <pubDate>Sun, 18 Aug 2024 02:30:37 GMT</pubDate>
+    <lastBuildDate>Sun, 18 Aug 2024 09:02:11 GMT</lastBuildDate>
+    <pubDate>Sun, 18 Aug 2024 09:02:11 GMT</pubDate>
     <ttl>1440</ttl>
     
     <item>
-      <title>r/nosurf and other subreddits</title>
-      <link>https://www.reddit.com/r/nosurf/</link>
+      <title>r/sehnsuchtpics and other subreddits</title>
+      <link>https://www.reddit.com/r/sehnsuchtpics/top/?t=week</link>
       <description></description>
-      <pubDate>Sun, 18 Aug 2024 02:30:37 GMT</pubDate>
-      <guid>https://www.reddit.com/r/nosurf/20240818</guid>
+      <pubDate>Sun, 18 Aug 2024 09:02:11 GMT</pubDate>
+      <guid>https://www.reddit.com/r/sehnsuchtpics/top/?t=week20240818</guid>
     </item>
     
     <item>
       <title>Deutschlandfunk Wochenrückblick</title>
       <link>https://www.ard-text.de/mobil/750</link>
       <description></description>
-      <pubDate>Sun, 18 Aug 2024 02:30:37 GMT</pubDate>
+      <pubDate>Sun, 18 Aug 2024 09:02:11 GMT</pubDate>
       <guid>https://www.ard-text.de/mobil/75020240818</guid>
     </item>
     
@@ -29,7 +29,7 @@
       <title>Wikipedia Topics in the News</title>
       <link>https://en.wikipedia.org/wiki/Portal:Current_events</link>
       <description></description>
-      <pubDate>Sun, 18 Aug 2024 02:30:37 GMT</pubDate>
+      <pubDate>Sun, 18 Aug 2024 09:02:11 GMT</pubDate>
       <guid>https://en.wikipedia.org/wiki/Portal:Current_events20240818</guid>
     </item>
     
@@ -37,7 +37,7 @@
       <title>Frankfurter Rundschau</title>
       <link>https://www.fr.de/rhein-main/darmstadt</link>
       <description></description>
-      <pubDate>Sun, 18 Aug 2024 02:30:37 GMT</pubDate>
+      <pubDate>Sun, 18 Aug 2024 09:02:11 GMT</pubDate>
       <guid>https://www.fr.de/rhein-main/20240818</guid>
     </item>
     
@@ -45,7 +45,7 @@
       <title>MIT Technology Review</title>
       <link>https://www.technologyreview.com/</link>
       <description></description>
-      <pubDate>Sun, 18 Aug 2024 02:30:37 GMT</pubDate>
+      <pubDate>Sun, 18 Aug 2024 09:02:11 GMT</pubDate>
       <guid>https://www.technologyreview.com/20240818</guid>
     </item>
 
@@ -53,8 +53,64 @@
       <title>Lifehacker (Junk)</title>
       <link>https://lifehacker.com/</link>
       <description></description>
-      <pubDate>Sun, 18 Aug 2024 02:30:37 GMT</pubDate>
+      <pubDate>Sun, 18 Aug 2024 09:02:11 GMT</pubDate>
       <guid>https://lifehacker.com/20240818</guid>
+    </item>
+
+    <item>
+      <title>https://www.test.de/archiv/</title>
+      <link>https://lifehacker.com/</link>
+      <description></description>
+      <pubDate>Sun, 18 Aug 2024 09:02:11 GMT</pubDate>
+      <guid>https://www.test.de/archiv/20240818</guid>
+    </item>
+
+    <item>
+      <title>Wikipedia 2024 in Science</title>
+      <link>https://en.m.wikipedia.org/wiki/2024_in_science</link>
+      <description></description>
+      <pubDate>Sun, 18 Aug 2024 09:02:11 GMT</pubDate>
+      <guid>https://en.m.wikipedia.org/wiki/2024_in_science20240818</guid>
+    </item>
+
+    <item>
+      <title>Wikipedia 2024 in Science</title>
+      <link>https://en.m.wikipedia.org/wiki/2024_in_science</link>
+      <description></description>
+      <pubDate>Sun, 18 Aug 2024 09:02:11 GMT</pubDate>
+      <guid>https://en.m.wikipedia.org/wiki/2024_in_science20240818</guid>
+    </item>
+
+    <item>
+      <title>Wikipedia 2024 in Germany</title>
+      <link>https://en.m.wikipedia.org/wiki/2024_in_Germany</link>
+      <description></description>
+      <pubDate>Sun, 18 Aug 2024 09:02:11 GMT</pubDate>
+      <guid>https://en.m.wikipedia.org/wiki/2024_in_Germany20240818</guid>
+    </item>
+
+    <item>
+      <title>Wikipedia 2024</title>
+      <link>https://en.m.wikipedia.org/wiki/2024</link>
+      <description></description>
+      <pubDate>Sun, 18 Aug 2024 09:02:11 GMT</pubDate>
+      <guid>https://en.m.wikipedia.org/wiki/202420240818</guid>
+    </item>
+
+    <item>
+      <title>logo!</title>
+      <link>https://www.zdf.de/kinder/logo</link>
+      <description></description>
+      <pubDate>Sun, 18 Aug 2024 09:02:11 GMT</pubDate>
+      <guid>https://www.zdf.de/kinder/logo20240818</guid>
+    </item>
+
+    <item>
+      <title>Verbraucherzentrale</title>
+      <link>https://www.verbraucherzentrale.de/</link>
+      <description></description>
+      <pubDate>Sun, 18 Aug 2024 09:02:11 GMT</pubDate>
+      <guid>https://www.verbraucherzentrale.de/20240818</guid>
     </item>
 
   </channel>
