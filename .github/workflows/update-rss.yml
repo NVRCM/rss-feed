@@ -18,9 +18,9 @@ jobs:
         echo "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>
         <rss version=\"2.0\">
           <channel>
-            <title>Weekly RSS Feed </title>
+            <title>Weekly</title>
             <link>http://www.example.com</link>
-            <description></description>
+            <description>My own weekend newspaper. Other feeds not listed here are directly subscribed. TODO maybe use a multiple link opener</description>
             <language>en-us</language>
             <lastBuildDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</lastBuildDate>
             <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
@@ -75,7 +75,7 @@ jobs:
             </item>
 
             <item>
-              <title>https://www.test.de/archiv/</title>
+              <title>Stiftung Warentest</title>
               <link>https://lifehacker.com/</link>
               <description></description>
               <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
@@ -128,6 +128,62 @@ jobs:
               <description></description>
               <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
               <guid>https://www.verbraucherzentrale.de/$(date -u +"%Y%m%d")</guid>
+            </item>
+
+            <item>
+              <title>TFreak</title>
+              <link>https://torrentfreak.com/</link>
+              <description></description>
+              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
+              <guid>https://torrentfreak.com/$(date -u +"%Y%m%d")</guid>
+            </item>
+
+            <item>
+              <title>DNews</title>
+              <link>https://www.darmstadtnews.de/</link>
+              <description></description>
+              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
+              <guid>https://www.darmstadtnews.de/$(date -u +"%Y%m%d")</guid>
+            </item>
+
+             <item>
+              <title>BBC Science Focus</title>
+              <link>https://www.sciencefocus.com/</link>
+              <description></description>
+              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
+              <guid>https://www.sciencefocus.com/$(date -u +"%Y%m%d")</guid>
+            </item>
+
+            <item>
+              <title>Scientific American</title>
+              <link>https://www.scientificamerican.com/</link>
+              <description>Useful?</description>
+              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
+              <guid>https://www.scientificamerican.com/$(date -u +"%Y%m%d")</guid>
+            </item>
+
+            <item>
+              <title>BBC Science Focus</title>
+              <link>https://www.sciencefocus.com/</link>
+              <description></description>
+              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
+              <guid>https://www.sciencefocus.com/$(date -u +"%Y%m%d")</guid>
+            </item>
+
+            <item>
+              <title>BR Wissen</title>
+              <link>https://www.br.de/nachrichten/wissen,QXAPyRp</link>
+              <description></description>
+              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
+              <guid>https://www.br.de/nachrichten/wissen,QXAPyRp/$(date -u +"%Y%m%d")</guid>
+            </item>
+
+            <item>
+              <title>Planet Wissen</title>
+              <link>https://www.planet-wissen.de/index.html</link>
+              <description></description>
+              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
+              <guid>https://www.planet-wissen.de/index.html$(date -u +"%Y%m%d")</guid>
             </item>
 
           </channel>
