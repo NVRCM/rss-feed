@@ -186,6 +186,30 @@ jobs:
               <guid>https://www.planet-wissen.de/index.html$(date -u +"%Y%m%d")</guid>
             </item>
 
+            <item>
+              <title>AP Science News</title>
+              <link>https://apnews.com/science</link>
+              <description></description>
+              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
+              <guid>https://apnews.com/science$(date -u +"%Y%m%d")</guid>
+            </item>
+
+            <item>
+              <title>OSHA PSA</title>
+              <link>https://www.osha.gov/psa</link>
+              <description></description>
+              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
+              <guid>https://www.osha.gov/psa$(date -u +"%Y%m%d")</guid>
+            </item>
+
+            <item>
+              <title>NDR Gesundheit</title>
+              <link>https://www.ndr.de/ratgeber/gesundheit/index.html</link>
+              <description></description>
+              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
+              <guid>https://www.ndr.de/ratgeber/gesundheit/index.html$(date -u +"%Y%m%d")</guid>
+            </item>
+
           </channel>
         </rss>" > rss_feed.xml
 
