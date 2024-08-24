@@ -20,7 +20,7 @@ jobs:
           <channel>
             <title>Weekly</title>
             <link>http://www.example.com</link>
-            <description>My own weekend newspaper. Other feeds not listed here are directly subscribed. TODO maybe use a multiple link opener</description>
+            <description>Still in Progess. Most Links are porbably useless. My own weekend newspaper. Other feeds not listed here are directly subscribed. TODO maybe use a multiple link opener</description>
             <language>en-us</language>
             <lastBuildDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</lastBuildDate>
             <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
@@ -208,6 +208,14 @@ jobs:
               <description></description>
               <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
               <guid>https://www.ndr.de/ratgeber/gesundheit/index.html$(date -u +"%Y%m%d")</guid>
+            </item>
+
+            <item>
+              <title>Engadget Science</title>
+              <link>https://www.engadget.com/science/</link>
+              <description></description>
+              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
+              <guid>https://www.engadget.com/science/$(date -u +"%Y%m%d")</guid>
             </item>
 
           </channel>
