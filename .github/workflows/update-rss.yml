@@ -76,7 +76,7 @@ jobs:
 
             <item>
               <title>Stiftung Warentest</title>
-              <link>https://lifehacker.com/</link>
+              <link>https://www.test.de/archiv/</link>
               <description></description>
               <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
               <guid>https://www.test.de/archiv/$(date -u +"%Y%m%d")</guid>
