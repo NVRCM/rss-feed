@@ -3,17 +3,17 @@
   <channel>
     <title>Weekly</title>
     <link>http://www.example.com</link>
-    <description>My own weekend newspaper. Other feeds not listed here are directly subscribed. TODO maybe use a multiple link opener</description>
+    <description>Still in Progess. Most Links are porbably useless. My own weekend newspaper. Other feeds not listed here are directly subscribed. TODO maybe use a multiple link opener</description>
     <language>en-us</language>
-    <lastBuildDate>Sat, 24 Aug 2024 02:28:08 GMT</lastBuildDate>
-    <pubDate>Sat, 24 Aug 2024 02:28:08 GMT</pubDate>
+    <lastBuildDate>Sat, 24 Aug 2024 14:31:35 GMT</lastBuildDate>
+    <pubDate>Sat, 24 Aug 2024 14:31:35 GMT</pubDate>
     <ttl>1440</ttl>
     
     <item>
       <title>r/sehnsuchtpics and other subreddits</title>
       <link>https://www.reddit.com/r/sehnsuchtpics/top/?t=week</link>
       <description></description>
-      <pubDate>Sat, 24 Aug 2024 02:28:08 GMT</pubDate>
+      <pubDate>Sat, 24 Aug 2024 14:31:35 GMT</pubDate>
       <guid>https://www.reddit.com/r/sehnsuchtpics/top/?t=week20240824</guid>
     </item>
     
@@ -21,7 +21,7 @@
       <title>Deutschlandfunk Wochenrückblick</title>
       <link>https://www.ard-text.de/mobil/750</link>
       <description></description>
-      <pubDate>Sat, 24 Aug 2024 02:28:08 GMT</pubDate>
+      <pubDate>Sat, 24 Aug 2024 14:31:35 GMT</pubDate>
       <guid>https://www.ard-text.de/mobil/75020240824</guid>
     </item>
     
@@ -29,7 +29,7 @@
       <title>Wikipedia Topics in the News</title>
       <link>https://en.wikipedia.org/wiki/Portal:Current_events</link>
       <description></description>
-      <pubDate>Sat, 24 Aug 2024 02:28:08 GMT</pubDate>
+      <pubDate>Sat, 24 Aug 2024 14:31:35 GMT</pubDate>
       <guid>https://en.wikipedia.org/wiki/Portal:Current_events20240824</guid>
     </item>
     
@@ -37,7 +37,7 @@
       <title>Frankfurter Rundschau</title>
       <link>https://www.fr.de/rhein-main/darmstadt</link>
       <description></description>
-      <pubDate>Sat, 24 Aug 2024 02:28:08 GMT</pubDate>
+      <pubDate>Sat, 24 Aug 2024 14:31:35 GMT</pubDate>
       <guid>https://www.fr.de/rhein-main/20240824</guid>
     </item>
     
@@ -45,7 +45,7 @@
       <title>MIT Technology Review</title>
       <link>https://www.technologyreview.com/</link>
       <description></description>
-      <pubDate>Sat, 24 Aug 2024 02:28:08 GMT</pubDate>
+      <pubDate>Sat, 24 Aug 2024 14:31:35 GMT</pubDate>
       <guid>https://www.technologyreview.com/20240824</guid>
     </item>
 
@@ -53,15 +53,15 @@
       <title>Lifehacker (Junk)</title>
       <link>https://lifehacker.com/</link>
       <description></description>
-      <pubDate>Sat, 24 Aug 2024 02:28:08 GMT</pubDate>
+      <pubDate>Sat, 24 Aug 2024 14:31:35 GMT</pubDate>
       <guid>https://lifehacker.com/20240824</guid>
     </item>
 
     <item>
       <title>Stiftung Warentest</title>
-      <link>https://lifehacker.com/</link>
+      <link>https://www.test.de/archiv/</link>
       <description></description>
-      <pubDate>Sat, 24 Aug 2024 02:28:08 GMT</pubDate>
+      <pubDate>Sat, 24 Aug 2024 14:31:35 GMT</pubDate>
       <guid>https://www.test.de/archiv/20240824</guid>
     </item>
 
@@ -69,7 +69,7 @@
       <title>Wikipedia 2024 in Science</title>
       <link>https://en.m.wikipedia.org/wiki/2024_in_science</link>
       <description></description>
-      <pubDate>Sat, 24 Aug 2024 02:28:08 GMT</pubDate>
+      <pubDate>Sat, 24 Aug 2024 14:31:35 GMT</pubDate>
       <guid>https://en.m.wikipedia.org/wiki/2024_in_science20240824</guid>
     </item>
 
@@ -77,7 +77,7 @@
       <title>Wikipedia 2024 in Science</title>
       <link>https://en.m.wikipedia.org/wiki/2024_in_science</link>
       <description></description>
-      <pubDate>Sat, 24 Aug 2024 02:28:08 GMT</pubDate>
+      <pubDate>Sat, 24 Aug 2024 14:31:35 GMT</pubDate>
       <guid>https://en.m.wikipedia.org/wiki/2024_in_science20240824</guid>
     </item>
 
@@ -85,7 +85,7 @@
       <title>Wikipedia 2024 in Germany</title>
       <link>https://en.m.wikipedia.org/wiki/2024_in_Germany</link>
       <description></description>
-      <pubDate>Sat, 24 Aug 2024 02:28:08 GMT</pubDate>
+      <pubDate>Sat, 24 Aug 2024 14:31:35 GMT</pubDate>
       <guid>https://en.m.wikipedia.org/wiki/2024_in_Germany20240824</guid>
     </item>
 
@@ -93,7 +93,7 @@
       <title>Wikipedia 2024</title>
       <link>https://en.m.wikipedia.org/wiki/2024</link>
       <description></description>
-      <pubDate>Sat, 24 Aug 2024 02:28:08 GMT</pubDate>
+      <pubDate>Sat, 24 Aug 2024 14:31:35 GMT</pubDate>
       <guid>https://en.m.wikipedia.org/wiki/202420240824</guid>
     </item>
 
@@ -101,7 +101,7 @@
       <title>logo!</title>
       <link>https://www.zdf.de/kinder/logo</link>
       <description></description>
-      <pubDate>Sat, 24 Aug 2024 02:28:08 GMT</pubDate>
+      <pubDate>Sat, 24 Aug 2024 14:31:35 GMT</pubDate>
       <guid>https://www.zdf.de/kinder/logo20240824</guid>
     </item>
 
@@ -109,7 +109,7 @@
       <title>Verbraucherzentrale</title>
       <link>https://www.verbraucherzentrale.de/</link>
       <description></description>
-      <pubDate>Sat, 24 Aug 2024 02:28:08 GMT</pubDate>
+      <pubDate>Sat, 24 Aug 2024 14:31:35 GMT</pubDate>
       <guid>https://www.verbraucherzentrale.de/20240824</guid>
     </item>
 
@@ -117,7 +117,7 @@
       <title>TFreak</title>
       <link>https://torrentfreak.com/</link>
       <description></description>
-      <pubDate>Sat, 24 Aug 2024 02:28:08 GMT</pubDate>
+      <pubDate>Sat, 24 Aug 2024 14:31:35 GMT</pubDate>
       <guid>https://torrentfreak.com/20240824</guid>
     </item>
 
@@ -125,7 +125,7 @@
       <title>DNews</title>
       <link>https://www.darmstadtnews.de/</link>
       <description></description>
-      <pubDate>Sat, 24 Aug 2024 02:28:08 GMT</pubDate>
+      <pubDate>Sat, 24 Aug 2024 14:31:35 GMT</pubDate>
       <guid>https://www.darmstadtnews.de/20240824</guid>
     </item>
 
@@ -133,7 +133,7 @@
       <title>BBC Science Focus</title>
       <link>https://www.sciencefocus.com/</link>
       <description></description>
-      <pubDate>Sat, 24 Aug 2024 02:28:08 GMT</pubDate>
+      <pubDate>Sat, 24 Aug 2024 14:31:35 GMT</pubDate>
       <guid>https://www.sciencefocus.com/20240824</guid>
     </item>
 
@@ -141,7 +141,7 @@
       <title>Scientific American</title>
       <link>https://www.scientificamerican.com/</link>
       <description>Useful?</description>
-      <pubDate>Sat, 24 Aug 2024 02:28:08 GMT</pubDate>
+      <pubDate>Sat, 24 Aug 2024 14:31:35 GMT</pubDate>
       <guid>https://www.scientificamerican.com/20240824</guid>
     </item>
 
@@ -149,7 +149,7 @@
       <title>BBC Science Focus</title>
       <link>https://www.sciencefocus.com/</link>
       <description></description>
-      <pubDate>Sat, 24 Aug 2024 02:28:08 GMT</pubDate>
+      <pubDate>Sat, 24 Aug 2024 14:31:35 GMT</pubDate>
       <guid>https://www.sciencefocus.com/20240824</guid>
     </item>
 
@@ -157,7 +157,7 @@
       <title>BR Wissen</title>
       <link>https://www.br.de/nachrichten/wissen,QXAPyRp</link>
       <description></description>
-      <pubDate>Sat, 24 Aug 2024 02:28:08 GMT</pubDate>
+      <pubDate>Sat, 24 Aug 2024 14:31:35 GMT</pubDate>
       <guid>https://www.br.de/nachrichten/wissen,QXAPyRp/20240824</guid>
     </item>
 
@@ -165,7 +165,7 @@
       <title>Planet Wissen</title>
       <link>https://www.planet-wissen.de/index.html</link>
       <description></description>
-      <pubDate>Sat, 24 Aug 2024 02:28:08 GMT</pubDate>
+      <pubDate>Sat, 24 Aug 2024 14:31:35 GMT</pubDate>
       <guid>https://www.planet-wissen.de/index.html20240824</guid>
     </item>
 
@@ -173,7 +173,7 @@
       <title>AP Science News</title>
       <link>https://apnews.com/science</link>
       <description></description>
-      <pubDate>Sat, 24 Aug 2024 02:28:08 GMT</pubDate>
+      <pubDate>Sat, 24 Aug 2024 14:31:35 GMT</pubDate>
       <guid>https://apnews.com/science20240824</guid>
     </item>
 
@@ -181,7 +181,7 @@
       <title>OSHA PSA</title>
       <link>https://www.osha.gov/psa</link>
       <description></description>
-      <pubDate>Sat, 24 Aug 2024 02:28:08 GMT</pubDate>
+      <pubDate>Sat, 24 Aug 2024 14:31:35 GMT</pubDate>
       <guid>https://www.osha.gov/psa20240824</guid>
     </item>
 
@@ -189,8 +189,16 @@
       <title>NDR Gesundheit</title>
       <link>https://www.ndr.de/ratgeber/gesundheit/index.html</link>
       <description></description>
-      <pubDate>Sat, 24 Aug 2024 02:28:08 GMT</pubDate>
+      <pubDate>Sat, 24 Aug 2024 14:31:35 GMT</pubDate>
       <guid>https://www.ndr.de/ratgeber/gesundheit/index.html20240824</guid>
+    </item>
+
+    <item>
+      <title>Engadget Science</title>
+      <link>https://www.engadget.com/science/</link>
+      <description></description>
+      <pubDate>Sat, 24 Aug 2024 14:31:35 GMT</pubDate>
+      <guid>https://www.engadget.com/science/20240824</guid>
     </item>
 
   </channel>
