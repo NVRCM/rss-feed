@@ -91,11 +91,11 @@ jobs:
             </item>
 
             <item>
-              <title>Wikipedia 2024 in Science</title>
-              <link>https://en.m.wikipedia.org/wiki/2024_in_science</link>
+              <title>ECDC</title>
+              <link>https://www.ecdc.europa.eu/en</link>
               <description></description>
               <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
-              <guid>https://en.m.wikipedia.org/wiki/2024_in_science$(date -u +"%Y%m%d")</guid>
+              <guid>https://www.ecdc.europa.eu/en$(date -u +"%Y%m%d")</guid>
             </item>
 
             <item>
