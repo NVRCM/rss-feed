@@ -234,6 +234,15 @@ jobs:
               <guid>https://www.nationalgeographic.com/related/4729be72-b8b0-34f6-88d5-0ffb5b256a38/reference$(date -u +"%Y%m%d")</guid>
             </item>
 
+            <item>
+              <title>TechCrunch</title>
+              <link>https://techcrunch.com/tag/week-in-review/</link>
+              <description></description>
+              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
+              <guid>https://techcrunch.com/tag/week-in-review/$(date -u +"%Y%m%d")</guid>
+            </item>
+
+
           </channel>
         </rss>" > rss_feed.xml
 
