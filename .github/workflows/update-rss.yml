@@ -235,11 +235,19 @@ jobs:
             </item>
 
             <item>
-              <title>TechCrunch</title>
+              <title>TechCrunch Week in Review</title>
               <link>https://techcrunch.com/tag/week-in-review/</link>
               <description></description>
               <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
               <guid>https://techcrunch.com/tag/week-in-review/$(date -u +"%Y%m%d")</guid>
+            </item>
+
+            <item>
+              <title>ArsTechnica Space</title>
+              <link>https://arstechnica.com/tag/space/</link>
+              <description></description>
+              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
+              <guid>https://arstechnica.com/tag/space/$(date -u +"%Y%m%d")</guid>
             </item>
 
 
