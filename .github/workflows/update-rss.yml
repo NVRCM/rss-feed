@@ -250,6 +250,22 @@ jobs:
               <guid>https://arstechnica.com/tag/space/$(date -u +"%Y%m%d")</guid>
             </item>
 
+            <item>
+              <title>Euronews Gesundheit</title>
+              <link>https://de.euronews.com/gesundheit</link>
+              <description></description>
+              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
+              <guid>https://de.euronews.com/gesundheit$(date -u +"%Y%m%d")</guid>
+            </item>
+
+            <item>
+              <title>Deutsche Welle Wissen</title>
+              <link>https://www.deutschlandfunk.de/wissen-106.html</link>
+              <description></description>
+              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
+              <guid>https://www.deutschlandfunk.de/wissen-106.html$(date -u +"%Y%m%d")</guid>
+            </item>
+
 
           </channel>
         </rss>" > rss_feed.xml
