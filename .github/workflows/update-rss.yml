@@ -2,18 +2,20 @@ name: Update RSS Feed  # Name of your workflow
 
 on:
   schedule:  # Event to trigger the workflow (weekly schedule in this case)
-    - cron: '0 0 * * 6'
+    - cron: '0 12 * * 5'
+    - cron: '0 12 * * 6'
   workflow_dispatch:  # Allows manual triggering of the workflow
 
 jobs:
-  update-feed:
+  update-feed-friday:
+    if: github.event.schedule.cron == '0 12 * * 5'
     runs-on: ubuntu-latest  # The environment the job will run on
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2  # Action to check out the repository
 
-    - name: Update RSS Feed
+    - name: Update RSS Feed Friday
       run: |
         echo "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>
         <rss version=\"2.0\">
@@ -154,6 +156,40 @@ jobs:
               <guid>https://www.sciencefocus.com/$(date -u +"%Y%m%d")</guid>
             </item>
 
+          </channel>
+        </rss>" > rss_feed.xml
+
+    - name: Commit and push changes
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@github.com"
+        git add rss_feed.xml
+        git commit -m "Updated RSS Feed"
+        git push https://${GITHUB_TOKEN}@github.com/NVRCM/rss-feed.git HEAD:main
+        
+  update-feed-saturday:
+    if: github.event.schedule.cron == '0 12 * * 6'
+    runs-on: ubuntu-latest  # The environment the job will run on
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2  # Action to check out the repository
+
+    - name: Update RSS Feed Saturday
+      run: |
+        echo "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>
+        <rss version=\"2.0\">
+          <channel>
+            <title>Weekly</title>
+            <link>http://www.example.com</link>
+            <description>Still in Progess. Most Links are porbably useless. My own weekend newspaper. Other feeds not listed here are directly subscribed. TODO maybe use a multiple link opener</description>
+            <language>en-us</language>
+            <lastBuildDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</lastBuildDate>
+            <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
+            <ttl>1440</ttl>
+            
             <item>
               <title>Scientific American</title>
               <link>https://www.scientificamerican.com/</link>
@@ -273,7 +309,6 @@ jobs:
               <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
               <guid>https://www.ardalpha.de/wissen/ard-alpha-wissen-rss-feed-100.html$(date -u +"%Y%m%d")</guid>
             </item>
-
 
           </channel>
         </rss>" > rss_feed.xml
