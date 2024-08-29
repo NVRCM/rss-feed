@@ -266,6 +266,14 @@ jobs:
               <guid>https://www.deutschlandfunk.de/wissen-106.html$(date -u +"%Y%m%d")</guid>
             </item>
 
+            <item>
+              <title>ARD Alpha Wissen RSS Version</title>
+              <link>https://www.ardalpha.de/wissen/ard-alpha-wissen-rss-feed-100.html</link>
+              <description></description>
+              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
+              <guid>https://www.ardalpha.de/wissen/ard-alpha-wissen-rss-feed-100.html$(date -u +"%Y%m%d")</guid>
+            </item>
+
 
           </channel>
         </rss>" > rss_feed.xml
