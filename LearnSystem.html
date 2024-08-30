@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-color: #f0f0f5;
+            color: #333;
+        }
+        header {
+            background: #ffffff;
+            border-bottom: 1px solid #dcdcdc;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #333;
+        }
+        .container {
+            width: 90%;
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        form {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        input[type="text"] {
+            padding: 12px;
+            border: 1px solid #dcdcdc;
+            border-radius: 8px;
+            flex: 1;
+            font-size: 16px;
+        }
+        input[type="button"] {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background-color: #007aff;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: background-color 0.3s;
+        }
+        input[type="button"]:hover {
+            background-color: #005bb5;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        .upload-btn {
+            display: inline-block;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background-color: #007aff;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: background-color 0.3s;
+        }
+        .upload-btn:hover {
+            background-color: #005bb5;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        li {
+            padding: 12px;
+            border-bottom: 1px solid #dcdcdc;
+        }
+        .description {
+            margin-top: 20px;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        .description h2 {
+            margin-top: 0;
+            font-size: 20px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Task Manager</h1>
+    </header>
+
+    <div class="container">
+        <form id="taskForm">
+            <input type="text" id="taskInput" placeholder="Add a new task...">
+            <input type="button" value="Add Task" onclick="addTask()">
+        </form>
+
+        <ul id="taskList"></ul>
+
+        <input type="button" value="Save Tasks" onclick="saveTasks()">
+        <label for="fileInput" class="upload-btn">Upload Tasks</label>
+        <input type="file" id="fileInput" onchange="loadTasks(event)" accept=".json">
+
+        <div class="description">
+            <h2>SM-2 Algorithm Description</h2>
+            <p>The SM-2 algorithm is used for spaced repetition, a technique to enhance long-term memory retention. It tracks the following properties for each card:</p>
+            <ul>
+                <li><strong>Repetition number (n)</strong>: Number of times the card has been successfully recalled in a row.</li>
+                <li><strong>Easiness factor (EF)</strong>: Indicates how "easy" the card is, starting at 2.5.</li>
+                <li><strong>Inter-repetition interval (I)</strong>: The time (in days) before the card is reviewed again.</li>
+            </ul>
+            <p>When reviewing a card, you grade your recall from 0 to 5, and the SM-2 algorithm updates n, EF, and I based on your grade.</p>
+        </div>
+    </div>
+
+    <script>
+        function getCookie(name) {
+            let value = "; " + document.cookie;
+            let parts = value.split("; " + name + "=");
+            if (parts.length == 2) return parts.pop().split(";").shift();
+        }
+
+        function setCookie(name, value, days) {
+            let date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            let expires = "expires=" + date.toUTCString();
+            document.cookie = name + "=" + value + ";" + expires + ";path=/";
+        }
+
+        function addTask() {
+            let taskInput = document.getElementById('taskInput');
+            let taskList = document.getElementById('taskList');
+            let task = taskInput.value.trim();
+            if (task) {
+                let tasks = getCookie('tasks');
+                tasks = tasks ? JSON.parse(tasks) : [];
+                tasks.push(task);
+                setCookie('tasks', JSON.stringify(tasks), 7);
+                displayTasks();
+                taskInput.value = '';
+            }
+        }
+
+        function displayTasks() {
+            let taskList = document.getElementById('taskList');
+            let tasks = getCookie('tasks');
+            tasks = tasks ? JSON.parse(tasks) : [];
+            taskList.innerHTML = '';
+            tasks.forEach(task => {
+                let li = document.createElement('li');
+                li.textContent = task;
+                taskList.appendChild(li);
+            });
+        }
+
+        function saveTasks() {
+            let tasks = getCookie('tasks');
+            if (tasks) {
+                let blob = new Blob([tasks], { type: 'application/json' });
+                let url = URL.createObjectURL(blob);
+                let a = document.createElement('a');
+                a.href = url;
+                a.download = 'tasks.json';
+                a.click();
+                URL.revokeObjectURL(url);
+            } else {
+                alert('No tasks to save.');
+            }
+        }
+
+        function loadTasks(event) {
+            let input = event.target;
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    let tasks = JSON.parse(e.target.result);
+                    setCookie('tasks', JSON.stringify(tasks), 7);
+                    displayTasks();
+                } catch (error) {
+                    alert('Error parsing JSON file.');
+                }
+            };
+            reader.readAsText(input.files[0]);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            displayTasks();
+        });
+    </script>
+</body>
+</html>
