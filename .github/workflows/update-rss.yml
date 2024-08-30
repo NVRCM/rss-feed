@@ -2,20 +2,18 @@ name: Update RSS Feed  # Name of your workflow
 
 on:
   schedule:  # Event to trigger the workflow (weekly schedule in this case)
-    - cron: '0 12 * * 5'
-    - cron: '0 12 * * 6'
+    - cron: '0 12 * * 5,6'
   workflow_dispatch:  # Allows manual triggering of the workflow
 
 jobs:
-  update-feed-friday:
-    if: github.event.schedule.cron == '0 12 * * 5'
+  update-feed:
     runs-on: ubuntu-latest  # The environment the job will run on
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2  # Action to check out the repository
 
-    - name: Update RSS Feed Friday
+    - name: Update RSS Feed
       run: |
         echo "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>
         <rss version=\"2.0\">
@@ -29,287 +27,13 @@ jobs:
             <ttl>1440</ttl>
             
             <item>
-              <title>r/sehnsuchtpics and other subreddits</title>
-              <link>https://www.reddit.com/r/sehnsuchtpics/top/?t=week</link>
+              <title>Weekly</title>
+              <link>https://nvrcm.github.io/rss-feed/LinkOpener.html</link>
               <description></description>
               <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
-              <guid>https://www.reddit.com/r/sehnsuchtpics/top/?t=week$(date -u +"%Y%m%d")</guid>
+              <guid>https://nvrcm.github.io/rss-feed/LinkOpener.html$(date -u +"%Y%m%d")</guid>
             </item>
             
-            <item>
-              <title>Deutschlandfunk Wochenrückblick</title>
-              <link>https://www.ard-text.de/mobil/750</link>
-              <description></description>
-              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
-              <guid>https://www.ard-text.de/mobil/750$(date -u +"%Y%m%d")</guid>
-            </item>
-            
-            <item>
-              <title>Wikipedia Topics in the News</title>
-              <link>https://en.wikipedia.org/wiki/Portal:Current_events</link>
-              <description></description>
-              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
-              <guid>https://en.wikipedia.org/wiki/Portal:Current_events$(date -u +"%Y%m%d")</guid>
-            </item>
-            
-            <item>
-              <title>Frankfurter Rundschau</title>
-              <link>https://www.fr.de/rhein-main/darmstadt</link>
-              <description></description>
-              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
-              <guid>https://www.fr.de/rhein-main/$(date -u +"%Y%m%d")</guid>
-            </item>
-            
-            <item>
-              <title>MIT Technology Review</title>
-              <link>https://www.technologyreview.com/</link>
-              <description></description>
-              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
-              <guid>https://www.technologyreview.com/$(date -u +"%Y%m%d")</guid>
-            </item>
-
-            <item>
-              <title>Lifehacker (Junk)</title>
-              <link>https://lifehacker.com/</link>
-              <description></description>
-              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
-              <guid>https://lifehacker.com/$(date -u +"%Y%m%d")</guid>
-            </item>
-
-            <item>
-              <title>Stiftung Warentest</title>
-              <link>https://www.test.de/archiv/</link>
-              <description></description>
-              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
-              <guid>https://www.test.de/archiv/$(date -u +"%Y%m%d")</guid>
-            </item>
-
-            <item>
-              <title>Wikipedia 2024 in Science</title>
-              <link>https://en.m.wikipedia.org/wiki/2024_in_science</link>
-              <description></description>
-              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
-              <guid>https://en.m.wikipedia.org/wiki/2024_in_science$(date -u +"%Y%m%d")</guid>
-            </item>
-
-            <item>
-              <title>ECDC</title>
-              <link>https://www.ecdc.europa.eu/en</link>
-              <description></description>
-              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
-              <guid>https://www.ecdc.europa.eu/en$(date -u +"%Y%m%d")</guid>
-            </item>
-
-            <item>
-              <title>Wikipedia 2024 in Germany</title>
-              <link>https://en.m.wikipedia.org/wiki/2024_in_Germany</link>
-              <description></description>
-              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
-              <guid>https://en.m.wikipedia.org/wiki/2024_in_Germany$(date -u +"%Y%m%d")</guid>
-            </item>
-
-            <item>
-              <title>Wikipedia 2024</title>
-              <link>https://en.m.wikipedia.org/wiki/2024</link>
-              <description></description>
-              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
-              <guid>https://en.m.wikipedia.org/wiki/2024$(date -u +"%Y%m%d")</guid>
-            </item>
-
-            <item>
-              <title>logo!</title>
-              <link>https://www.zdf.de/kinder/logo</link>
-              <description></description>
-              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
-              <guid>https://www.zdf.de/kinder/logo$(date -u +"%Y%m%d")</guid>
-            </item>
-
-            <item>
-              <title>Verbraucherzentrale</title>
-              <link>https://www.verbraucherzentrale.de/</link>
-              <description></description>
-              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
-              <guid>https://www.verbraucherzentrale.de/$(date -u +"%Y%m%d")</guid>
-            </item>
-
-            <item>
-              <title>TFreak</title>
-              <link>https://torrentfreak.com/</link>
-              <description></description>
-              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
-              <guid>https://torrentfreak.com/$(date -u +"%Y%m%d")</guid>
-            </item>
-
-            <item>
-              <title>DNews</title>
-              <link>https://www.darmstadtnews.de/</link>
-              <description></description>
-              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
-              <guid>https://www.darmstadtnews.de/$(date -u +"%Y%m%d")</guid>
-            </item>
-
-             <item>
-              <title>BBC Science Focus</title>
-              <link>https://www.sciencefocus.com/</link>
-              <description></description>
-              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
-              <guid>https://www.sciencefocus.com/$(date -u +"%Y%m%d")</guid>
-            </item>
-
-          </channel>
-        </rss>" > rss_feed.xml
-
-    - name: Commit and push changes
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        git config --global user.name "GitHub Actions"
-        git config --global user.email "actions@github.com"
-        git add rss_feed.xml
-        git commit -m "Updated RSS Feed"
-        git push https://${GITHUB_TOKEN}@github.com/NVRCM/rss-feed.git HEAD:main
-        
-  update-feed-saturday:
-    if: github.event.schedule.cron == '0 12 * * 6'
-    runs-on: ubuntu-latest  # The environment the job will run on
-
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2  # Action to check out the repository
-
-    - name: Update RSS Feed Saturday
-      run: |
-        echo "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>
-        <rss version=\"2.0\">
-          <channel>
-            <title>Weekly</title>
-            <link>http://www.example.com</link>
-            <description>Still in Progess. Most Links are porbably useless. My own weekend newspaper. Other feeds not listed here are directly subscribed. TODO maybe use a multiple link opener</description>
-            <language>en-us</language>
-            <lastBuildDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</lastBuildDate>
-            <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
-            <ttl>1440</ttl>
-            
-            <item>
-              <title>Scientific American</title>
-              <link>https://www.scientificamerican.com/</link>
-              <description>Useful?</description>
-              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
-              <guid>https://www.scientificamerican.com/$(date -u +"%Y%m%d")</guid>
-            </item>
-
-            <item>
-              <title>BBC Science Focus</title>
-              <link>https://www.sciencefocus.com/</link>
-              <description></description>
-              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
-              <guid>https://www.sciencefocus.com/$(date -u +"%Y%m%d")</guid>
-            </item>
-
-            <item>
-              <title>BR Wissen</title>
-              <link>https://www.br.de/nachrichten/wissen,QXAPyRp</link>
-              <description></description>
-              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
-              <guid>https://www.br.de/nachrichten/wissen,QXAPyRp/$(date -u +"%Y%m%d")</guid>
-            </item>
-
-            <item>
-              <title>Planet Wissen</title>
-              <link>https://www.planet-wissen.de/index.html</link>
-              <description></description>
-              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
-              <guid>https://www.planet-wissen.de/index.html$(date -u +"%Y%m%d")</guid>
-            </item>
-
-            <item>
-              <title>AP Science News</title>
-              <link>https://apnews.com/science</link>
-              <description></description>
-              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
-              <guid>https://apnews.com/science$(date -u +"%Y%m%d")</guid>
-            </item>
-
-            <item>
-              <title>OSHA PSA</title>
-              <link>https://www.osha.gov/psa</link>
-              <description></description>
-              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
-              <guid>https://www.osha.gov/psa$(date -u +"%Y%m%d")</guid>
-            </item>
-
-            <item>
-              <title>NDR Gesundheit</title>
-              <link>https://www.ndr.de/ratgeber/gesundheit/index.html</link>
-              <description></description>
-              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
-              <guid>https://www.ndr.de/ratgeber/gesundheit/index.html$(date -u +"%Y%m%d")</guid>
-            </item>
-
-            <item>
-              <title>Engadget Science</title>
-              <link>https://www.engadget.com/science/</link>
-              <description></description>
-              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
-              <guid>https://www.engadget.com/science/$(date -u +"%Y%m%d")</guid>
-            </item>
-
-            <item>
-              <title>NPR Science</title>
-              <link>https://www.npr.org/sections/space/</link>
-              <description></description>
-              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
-              <guid>https://www.npr.org/sections/space/$(date -u +"%Y%m%d")</guid>
-            </item>
-
-            <item>
-              <title>National Geographic</title>
-              <link>https://www.nationalgeographic.com/related/4729be72-b8b0-34f6-88d5-0ffb5b256a38/reference</link>
-              <description></description>
-              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
-              <guid>https://www.nationalgeographic.com/related/4729be72-b8b0-34f6-88d5-0ffb5b256a38/reference$(date -u +"%Y%m%d")</guid>
-            </item>
-
-            <item>
-              <title>TechCrunch Week in Review</title>
-              <link>https://techcrunch.com/tag/week-in-review/</link>
-              <description></description>
-              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
-              <guid>https://techcrunch.com/tag/week-in-review/$(date -u +"%Y%m%d")</guid>
-            </item>
-
-            <item>
-              <title>ArsTechnica Space</title>
-              <link>https://arstechnica.com/tag/space/</link>
-              <description></description>
-              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
-              <guid>https://arstechnica.com/tag/space/$(date -u +"%Y%m%d")</guid>
-            </item>
-
-            <item>
-              <title>Euronews Gesundheit</title>
-              <link>https://de.euronews.com/gesundheit</link>
-              <description></description>
-              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
-              <guid>https://de.euronews.com/gesundheit$(date -u +"%Y%m%d")</guid>
-            </item>
-
-            <item>
-              <title>Deutsche Welle Wissen</title>
-              <link>https://www.deutschlandfunk.de/wissen-106.html</link>
-              <description></description>
-              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
-              <guid>https://www.deutschlandfunk.de/wissen-106.html$(date -u +"%Y%m%d")</guid>
-            </item>
-
-            <item>
-              <title>ARD Alpha Wissen RSS Version</title>
-              <link>https://www.ardalpha.de/wissen/ard-alpha-wissen-rss-feed-100.html</link>
-              <description></description>
-              <pubDate>$(date -u +"%a, %d %b %Y %H:%M:%S GMT")</pubDate>
-              <guid>https://www.ardalpha.de/wissen/ard-alpha-wissen-rss-feed-100.html$(date -u +"%Y%m%d")</guid>
-            </item>
-
           </channel>
         </rss>" > rss_feed.xml
 
