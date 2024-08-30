@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Link Opener</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Function to open tabs based on day and time
+            function openTabs() {
+                const now = new Date();
+                const day = now.getDay(); // 0 (Sunday) to 6 (Saturday)
+                const hour = now.getHours();
+
+                // Define the URLs to open for each condition
+                const urls = {
+                    friday: [
+                        'https://www.reddit.com/r/sehnsuchtpics/top/?t=week',
+                        'https://www.ard-text.de/mobil/750',
+                        'https://en.wikipedia.org/wiki/Portal:Current_events',
+                        'https://www.fr.de/rhein-main/darmstadt',
+                        'https://www.technologyreview.com/',
+                        'https://lifehacker.com/',
+                        'https://www.test.de/archiv/',
+                        'https://en.m.wikipedia.org/wiki/2024_in_science',
+                        'https://www.ecdc.europa.eu/en',
+                        'https://en.m.wikipedia.org/wiki/2024_in_Germany',
+                        'https://en.m.wikipedia.org/wiki/2024',
+                        'https://www.zdf.de/kinder/logo',
+                        'https://www.verbraucherzentrale.de/',
+                        'https://torrentfreak.com/',
+                        'https://www.darmstadtnews.de/',
+                        'https://www.sciencefocus.com/'
+                    ],
+                    saturday: [
+                        'https://www.scientificamerican.com/',
+                        'https://www.sciencefocus.com/',
+                        'https://www.br.de/nachrichten/wissen,QXAPyRp',
+                        'https://www.planet-wissen.de/index.html',
+                        'https://apnews.com/science',
+                        'https://www.osha.gov/psa',
+                        'https://www.ndr.de/ratgeber/gesundheit/index.html',
+                        'https://www.engadget.com/science/',
+                        'https://www.npr.org/sections/space/',
+                        'https://www.nationalgeographic.com/related/4729be72-b8b0-34f6-88d5-0ffb5b256a38/reference',
+                        'https://techcrunch.com/tag/week-in-review/',
+                        'https://arstechnica.com/tag/space/',
+                        'https://de.euronews.com/gesundheit',
+                        'https://www.deutschlandfunk.de/wissen-106.html',
+                        'https://www.ardalpha.de/wissen/ard-alpha-wissen-rss-feed-100.html'
+                    ]
+                };
+
+                // Check if it's Friday 2 PM
+                if (day === 5 && hour === 14) { // Friday (5) and 2 PM (14)
+                    urls.friday.forEach(url => {
+                        window.open(url, '_blank');
+                    });
+                } 
+                // Check if it's Saturday
+                else if (day === 6) { // Saturday (6)
+                    urls.saturday.forEach(url => {
+                        window.open(url, '_blank');
+                    });
+                } else {
+                    // Close the page or make it blank
+                    window.close();
+                    document.body.innerHTML = '<h1>This page is not active now.</h1>';
+                }
+            }
+
+            // Execute the function to open tabs
+            openTabs();
+        });
+    </script>
+</head>
+<body>
+</body>
+</html>
