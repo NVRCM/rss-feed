@@ -56,12 +56,14 @@
                     urls.friday.forEach(url => {
                         window.open(url, '_blank');
                     });
+                    window.close();
                 } 
                 // Check if it's Saturday
                 else if (day === 6) { // Saturday (6)
                     urls.saturday.forEach(url => {
                         window.open(url, '_blank');
                     });
+                     window.close();
                 } else {
                     // Close the page or make it blank
                     window.close();
