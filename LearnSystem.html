@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Task Manager with Pomodoro Timer</title>
     <style>
         /* Body styling */
         body {
@@ -18,13 +17,13 @@
         header {
             text-align: center;
             padding-bottom: 20px;
-            border-bottom: 1px solid rgb(29, 29, 31);
             margin-bottom: 20px;
         }
 
         h1 {
             font-size: 28px;
             font-weight: 600;
+            margin: 0;
         }
 
         /* Form styling */
@@ -67,6 +66,7 @@
         ul {
             list-style: none;
             padding: 0;
+            margin: 0;
         }
 
         .category {
@@ -118,7 +118,6 @@
             bottom: 20px;
             left: 20px;
             right: 20px;
-            border-top: 1px solid rgb(29, 29, 31);
             padding-top: 20px;
             margin-top: 20px;
         }
@@ -131,12 +130,6 @@
 
         .pomodoro-stats {
             margin-top: 10px;
-            position: relative;
-        }
-
-        .chart {
-            width: 100%;
-            height: 200px;
         }
 
         .timer-controls {
@@ -175,6 +168,7 @@
             <input type="number" id="longBreakTime" placeholder="Long Break Time (min)" value="15">
             <input type="button" value="Start Timer" class="pomodoro-btn" onclick="startPomodoro()">
             <input type="button" value="Stop Timer" class="pomodoro-btn" onclick="stopPomodoro()">
+            <input type="button" value="Reset Timer Defaults" class="pomodoro-btn" onclick="resetTimerDefaults()">
             <input type="button" value="Reset Statistics" class="pomodoro-btn" onclick="resetPomodoroStats()">
         </div>
         <div id="pomodoroStats" class="pomodoro-stats"></div>
@@ -188,9 +182,8 @@
     <script>
         let timerInterval;
         let endTime;
-        let workSessions = parseInt(getCookie('workSessions')) || 0;
-        let breakSessions = parseInt(getCookie('breakSessions')) || 0;
-        let longBreakSessions = parseInt(getCookie('longBreakSessions')) || 0;
+        let timerStartTime;
+        let timerElapsed = 0;
 
         function getCookie(name) {
             let value = "; " + document.cookie;
@@ -364,10 +357,6 @@
             reader.readAsText(input.files[0]);
         }
 
-        // Pomodoro Timer Functions
-        let timerStartTime;
-        let timerElapsed = 0;
-
         function startPomodoro() {
             let workTime = parseInt(document.getElementById('workTime').value) * 60;
             let breakTime = parseInt(document.getElementById('breakTime').value) * 60;
@@ -391,7 +380,7 @@
                 setTimeout(() => {
                     longBreakSessions++;
                     setCookie('longBreakSessions', longBreakSessions, 7);
-                    displayPomodoroStats();
+                    updatePomodoroStats();
                 }, longBreakTime * 1000);
             } else {
                 // Regular break
@@ -400,7 +389,7 @@
                     workSessions++;
                     setCookie('workSessions', workSessions, 7);
                     alert('Work session completed! Start your break.');
-                    displayPomodoroStats();
+                    updatePomodoroStats();
                 }, workTime * 1000);
             }
 
@@ -427,6 +416,13 @@
             updatePomodoroStats();
         }
 
+        function resetTimerDefaults() {
+            document.getElementById('workTime').value = 25;
+            document.getElementById('breakTime').value = 5;
+            document.getElementById('longBreakAfter').value = 4;
+            document.getElementById('longBreakTime').value = 15;
+        }
+
         function updateTimerDisplay() {
             let now = new Date().getTime();
             let timeLeft = endTime - now;
@@ -443,55 +439,24 @@
 
         function playSound(soundId) {
             let audio = document.getElementById(soundId);
-            if (audio) {
+            if (audio && audio.canPlayType) {
                 audio.play().catch(e => {
                     console.error('Audio playback error:', e);
                 });
             }
         }
 
-        function displayPomodoroStats() {
+        function updatePomodoroStats() {
             let workSessions = getCookie('workSessions') || 0;
             let breakSessions = getCookie('breakSessions') || 0;
             let longBreakSessions = getCookie('longBreakSessions') || 0;
 
-            let ctx = document.createElement('canvas').getContext('2d');
-            ctx.width = 400;
-            ctx.height = 200;
             document.getElementById('pomodoroStats').innerHTML = `
-                <canvas id="pomodoroChart" class="chart"></canvas>
+                Work Sessions: ${workSessions}<br>
+                Break Sessions: ${breakSessions}<br>
+                Long Breaks: ${longBreakSessions}
             `;
 
-            new Chart(document.getElementById('pomodoroChart'), {
-                type: 'bar',
-                data: {
-                    labels: ['Work Sessions', 'Break Sessions', 'Long Breaks'],
-                    datasets: [{
-                        data: [workSessions, breakSessions, longBreakSessions],
-                        backgroundColor: 'white',
-                        borderColor: 'rgb(29, 29, 31)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        x: {
-                            beginAtZero: true,
-                            grid: { display: false }
-                        },
-                        y: {
-                            beginAtZero: true,
-                            grid: { display: false }
-                        }
-                    },
-                    plugins: {
-                        legend: { display: false }
-                    }
-                }
-            });
-        }
-
-        function updatePomodoroStats() {
             let stats = getCookie('pomodoroStats');
             let today = new Date().toISOString().split('T')[0];
             let pastStats = stats ? JSON.parse(stats) : {};
@@ -501,12 +466,11 @@
                 longBreakSessions: parseInt(getCookie('longBreakSessions')) || 0
             };
             setCookie('pomodoroStats', JSON.stringify(pastStats), 7);
-            displayPomodoroStats();
         }
 
         // Initial display
         displayTasks();
-        displayPomodoroStats();
+        updatePomodoroStats();
     </script>
 </body>
 </html>
