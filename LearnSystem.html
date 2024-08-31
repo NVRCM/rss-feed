@@ -88,7 +88,7 @@
             background-color: rgb(245, 245, 245);
         }
 
-        .grade-btn {
+        .grade-btn, .delete-btn, .pomodoro-btn {
             border: none;
             color: rgb(29, 29, 31);
             padding: 8px 16px;
@@ -99,30 +99,17 @@
             transition: background-color 0.2s;
         }
 
-        .grade-btn:hover {
-            background-color: rgb(245, 245, 245);
-        }
-
-        .delete-btn {
-            border: none;
-            color: rgb(29, 29, 31);
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            background-color: white;
-            transition: background-color 0.2s;
-        }
-
-        .delete-btn:hover {
+        .grade-btn:hover, .delete-btn:hover, .pomodoro-btn:hover {
             background-color: rgb(245, 245, 245);
         }
 
         /* Fixed Save/Upload buttons */
         .fixed-btn-container {
             position: fixed;
-            bottom: 20px;
+            bottom: 80px;
             right: 20px;
+            display: flex;
+            gap: 10px;
         }
 
         /* Pomodoro Timer styling */
@@ -144,11 +131,16 @@
 
         .pomodoro-stats {
             margin-top: 10px;
+            position: relative;
         }
 
         .chart {
             width: 100%;
             height: 200px;
+        }
+
+        .timer-controls {
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -169,7 +161,7 @@
     <!-- Save and upload buttons -->
     <div class="fixed-btn-container">
         <input type="button" value="Save Tasks" onclick="saveTasks()">
-        <label for="fileInput" class="upload-btn">Upload Tasks</label>
+        <label for="fileInput" class="pomodoro-btn">Upload Tasks</label>
         <input type="file" id="fileInput" onchange="loadTasks(event)" accept=".json">
     </div>
 
@@ -181,8 +173,9 @@
             <input type="number" id="breakTime" placeholder="Break Time (min)" value="5">
             <input type="number" id="longBreakAfter" placeholder="Sessions before Long Break" value="4">
             <input type="number" id="longBreakTime" placeholder="Long Break Time (min)" value="15">
-            <input type="button" value="Start Timer" onclick="startPomodoro()">
-            <input type="button" value="Reset Statistics" onclick="resetPomodoroStats()">
+            <input type="button" value="Start Timer" class="pomodoro-btn" onclick="startPomodoro()">
+            <input type="button" value="Stop Timer" class="pomodoro-btn" onclick="stopPomodoro()">
+            <input type="button" value="Reset Statistics" class="pomodoro-btn" onclick="resetPomodoroStats()">
         </div>
         <div id="pomodoroStats" class="pomodoro-stats"></div>
         <div id="timerDisplay" class="pomodoro-stats"></div>
@@ -195,6 +188,9 @@
     <script>
         let timerInterval;
         let endTime;
+        let workSessions = parseInt(getCookie('workSessions')) || 0;
+        let breakSessions = parseInt(getCookie('breakSessions')) || 0;
+        let longBreakSessions = parseInt(getCookie('longBreakSessions')) || 0;
 
         function getCookie(name) {
             let value = "; " + document.cookie;
@@ -233,7 +229,7 @@
             let tasks = getCookie('tasks');
             tasks = tasks ? JSON.parse(tasks) : [];
             taskList.innerHTML = '';
-            
+
             let groupedTasks = tasks.reduce((acc, task) => {
                 if (!acc[task.category]) {
                     acc[task.category] = [];
@@ -244,12 +240,12 @@
 
             Object.keys(groupedTasks).forEach(category => {
                 let tasksInCategory = groupedTasks[category];
-                
+
                 let categoryHeader = document.createElement('div');
                 categoryHeader.className = 'category';
                 categoryHeader.textContent = category;
                 taskList.appendChild(categoryHeader);
-                
+
                 tasksInCategory.sort((a, b) => {
                     return new Date(a.lastReview).getTime() + (a.I * 24 * 60 * 60 * 1000) - new Date(b.lastReview).getTime() - (b.I * 24 * 60 * 60 * 1000);
                 });
@@ -369,6 +365,9 @@
         }
 
         // Pomodoro Timer Functions
+        let timerStartTime;
+        let timerElapsed = 0;
+
         function startPomodoro() {
             let workTime = parseInt(document.getElementById('workTime').value) * 60;
             let breakTime = parseInt(document.getElementById('breakTime').value) * 60;
@@ -380,13 +379,14 @@
                 return;
             }
 
+            if (timerInterval) clearInterval(timerInterval);
+
             let workSessions = parseInt(getCookie('workSessions')) || 0;
             let breakSessions = parseInt(getCookie('breakSessions')) || 0;
             let longBreakSessions = parseInt(getCookie('longBreakSessions')) || 0;
 
             if (workSessions % longBreakAfter === 0 && workSessions !== 0) {
                 // Long break
-                alert('Time for a long break!');
                 playSound('breakSound');
                 setTimeout(() => {
                     longBreakSessions++;
@@ -404,28 +404,50 @@
                 }, workTime * 1000);
             }
 
-            // Timer Display
-            endTime = new Date().getTime() + (workTime * 1000);
+            timerStartTime = new Date().getTime();
+            endTime = timerStartTime + (workTime * 1000);
             timerInterval = setInterval(updateTimerDisplay, 1000);
+        }
+
+        function stopPomodoro() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+                let currentTime = new Date().getTime();
+                timerElapsed += (currentTime - timerStartTime) / 1000;
+                updatePomodoroStats();
+                document.getElementById('timerDisplay').innerHTML = `Paused: ${Math.floor(timerElapsed / 60)}m ${Math.floor(timerElapsed % 60)}s`;
+            }
+        }
+
+        function resetPomodoroStats() {
+            setCookie('workSessions', 0, 7);
+            setCookie('breakSessions', 0, 7);
+            setCookie('longBreakSessions', 0, 7);
+            updatePomodoroStats();
         }
 
         function updateTimerDisplay() {
             let now = new Date().getTime();
             let timeLeft = endTime - now;
-            let minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-            let seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-            document.getElementById('timerDisplay').innerHTML = `
-                Time Left: ${minutes}m ${seconds}s
-            `;
             if (timeLeft <= 0) {
                 clearInterval(timerInterval);
                 document.getElementById('timerDisplay').innerHTML = 'Time is up!';
                 playSound('pomodoroSound');
+                return;
             }
+            let minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+            let seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+            document.getElementById('timerDisplay').innerHTML = `Time Left: ${minutes}m ${seconds}s`;
         }
 
         function playSound(soundId) {
-            document.getElementById(soundId).play();
+            let audio = document.getElementById(soundId);
+            if (audio) {
+                audio.play().catch(e => {
+                    console.error('Audio playback error:', e);
+                });
+            }
         }
 
         function displayPomodoroStats() {
@@ -433,21 +455,21 @@
             let breakSessions = getCookie('breakSessions') || 0;
             let longBreakSessions = getCookie('longBreakSessions') || 0;
 
-            // Use a basic graph library or manual rendering
             let ctx = document.createElement('canvas').getContext('2d');
             ctx.width = 400;
             ctx.height = 200;
             document.getElementById('pomodoroStats').innerHTML = `
                 <canvas id="pomodoroChart" class="chart"></canvas>
             `;
-            let chart = new Chart(document.getElementById('pomodoroChart'), {
+
+            new Chart(document.getElementById('pomodoroChart'), {
                 type: 'bar',
                 data: {
                     labels: ['Work Sessions', 'Break Sessions', 'Long Breaks'],
                     datasets: [{
                         data: [workSessions, breakSessions, longBreakSessions],
-                        backgroundColor: ['#ffffff', '#ffffff', '#ffffff'],
-                        borderColor: ['#1d1d1f', '#1d1d1f', '#1d1d1f'],
+                        backgroundColor: 'white',
+                        borderColor: 'rgb(29, 29, 31)',
                         borderWidth: 1
                     }]
                 },
@@ -469,18 +491,22 @@
             });
         }
 
-        function resetPomodoroStats() {
-            setCookie('workSessions', 0, 7);
-            setCookie('breakSessions', 0, 7);
-            setCookie('longBreakSessions', 0, 7);
+        function updatePomodoroStats() {
+            let stats = getCookie('pomodoroStats');
+            let today = new Date().toISOString().split('T')[0];
+            let pastStats = stats ? JSON.parse(stats) : {};
+            pastStats[today] = {
+                workSessions: parseInt(getCookie('workSessions')) || 0,
+                breakSessions: parseInt(getCookie('breakSessions')) || 0,
+                longBreakSessions: parseInt(getCookie('longBreakSessions')) || 0
+            };
+            setCookie('pomodoroStats', JSON.stringify(pastStats), 7);
             displayPomodoroStats();
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            displayTasks();
-            displayPomodoroStats();
-        });
+        // Initial display
+        displayTasks();
+        displayPomodoroStats();
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>
 </html>
