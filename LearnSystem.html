@@ -46,7 +46,7 @@
 
         input[type="button"] {
             padding: 12px 18px;
-            border: 1px solid rgb(29, 29, 31);
+            border: none;
             border-radius: 8px;
             background-color: white;
             color: rgb(29, 29, 31);
@@ -88,8 +88,8 @@
             background-color: rgb(245, 245, 245);
         }
 
-        .grade-btn, .delete-btn {
-            border: 1px solid rgb(29, 29, 31);
+        .grade-btn {
+            border: none;
             color: rgb(29, 29, 31);
             padding: 8px 16px;
             border-radius: 8px;
@@ -99,30 +99,38 @@
             transition: background-color 0.2s;
         }
 
-        .grade-btn:hover, .delete-btn:hover {
+        .grade-btn:hover {
             background-color: rgb(245, 245, 245);
         }
 
-        /* Save and upload button styling */
+        .delete-btn {
+            border: none;
+            color: rgb(29, 29, 31);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            background-color: white;
+            transition: background-color 0.2s;
+        }
+
+        .delete-btn:hover {
+            background-color: rgb(245, 245, 245);
+        }
+
+        /* Fixed Save/Upload buttons */
         .fixed-btn-container {
             position: fixed;
             bottom: 20px;
             right: 20px;
         }
 
-        .description {
-            margin-top: 20px;
-            font-size: 16px;
-            line-height: 1.6;
-        }
-
-        .description h2 {
-            margin-top: 0;
-            font-size: 20px;
-        }
-
         /* Pomodoro Timer styling */
         .pomodoro-timer {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
             border-top: 1px solid rgb(29, 29, 31);
             padding-top: 20px;
             margin-top: 20px;
@@ -136,6 +144,11 @@
 
         .pomodoro-stats {
             margin-top: 10px;
+        }
+
+        .chart {
+            width: 100%;
+            height: 200px;
         }
     </style>
 </head>
@@ -166,25 +179,23 @@
         <div class="pomodoro-controls">
             <input type="number" id="workTime" placeholder="Work Time (min)" value="25">
             <input type="number" id="breakTime" placeholder="Break Time (min)" value="5">
+            <input type="number" id="longBreakAfter" placeholder="Sessions before Long Break" value="4">
+            <input type="number" id="longBreakTime" placeholder="Long Break Time (min)" value="15">
             <input type="button" value="Start Timer" onclick="startPomodoro()">
             <input type="button" value="Reset Statistics" onclick="resetPomodoroStats()">
         </div>
-        <div class="pomodoro-stats" id="pomodoroStats"></div>
+        <div id="pomodoroStats" class="pomodoro-stats"></div>
+        <div id="timerDisplay" class="pomodoro-stats"></div>
     </div>
 
-    <!-- Description of the SM-2 algorithm -->
-    <div class="description">
-        <h2>SM-2 Algorithm Description</h2>
-        <p>The SM-2 algorithm is used for spaced repetition, a technique to enhance long-term memory retention. It tracks the following properties for each card:</p>
-        <ul>
-            <li><strong>Repetition number (n)</strong>: Number of times the card has been successfully recalled in a row.</li>
-            <li><strong>Easiness factor (EF)</strong>: Indicates how "easy" the card is, starting at 2.5.</li>
-            <li><strong>Inter-repetition interval (I)</strong>: The time (in days) before the card is reviewed again.</li>
-        </ul>
-        <p>When reviewing a card, you grade your recall from 0 to 5, and the SM-2 algorithm updates n, EF, and I based on your grade.</p>
-    </div>
+    <!-- Sound for timer notifications -->
+    <audio id="pomodoroSound" src="pomodoro.mp3" preload="auto"></audio>
+    <audio id="breakSound" src="break.mp3" preload="auto"></audio>
 
     <script>
+        let timerInterval;
+        let endTime;
+
         function getCookie(name) {
             let value = "; " + document.cookie;
             let parts = value.split("; " + name + "=");
@@ -242,19 +253,14 @@
                 tasksInCategory.sort((a, b) => {
                     return new Date(a.lastReview).getTime() + (a.I * 24 * 60 * 60 * 1000) - new Date(b.lastReview).getTime() - (b.I * 24 * 60 * 60 * 1000);
                 });
-                
+
                 tasksInCategory.forEach((task, index) => {
                     let nextReviewDate = calculateNextReviewDate(task.lastReview, task.I);
                     let li = document.createElement('li');
                     li.innerHTML = `
                         ${task.text} - Next Review: ${nextReviewDate.toDateString()}
                         <div>
-                            <button class="grade-btn" onclick="gradeTask(${index}, 5)">5</button>
-                            <button class="grade-btn" onclick="gradeTask(${index}, 4)">4</button>
-                            <button class="grade-btn" onclick="gradeTask(${index}, 3)">3</button>
-                            <button class="grade-btn" onclick="gradeTask(${index}, 2)">2</button>
-                            <button class="grade-btn" onclick="gradeTask(${index}, 1)">1</button>
-                            <button class="grade-btn" onclick="gradeTask(${index}, 0)">0</button>
+                            <button class="grade-btn" onclick="showGrades(${index})">Review</button>
                             <button class="delete-btn" onclick="deleteTask(${index})">Delete</button>
                         </div>`;
                     taskList.appendChild(li);
@@ -266,6 +272,22 @@
             let reviewDate = new Date(lastReview);
             reviewDate.setDate(reviewDate.getDate() + interval);
             return reviewDate;
+        }
+
+        function showGrades(index) {
+            let taskList = document.getElementById('taskList');
+            let items = taskList.querySelectorAll('li');
+            let item = items[index];
+            let gradesHtml = `
+                <div>
+                    <button class="grade-btn" onclick="gradeTask(${index}, 5)">5</button>
+                    <button class="grade-btn" onclick="gradeTask(${index}, 4)">4</button>
+                    <button class="grade-btn" onclick="gradeTask(${index}, 3)">3</button>
+                    <button class="grade-btn" onclick="gradeTask(${index}, 2)">2</button>
+                    <button class="grade-btn" onclick="gradeTask(${index}, 1)">1</button>
+                    <button class="grade-btn" onclick="gradeTask(${index}, 0)">0</button>
+                </div>`;
+            item.innerHTML = item.innerHTML.replace('Review', 'Done') + gradesHtml;
         }
 
         function gradeTask(index, q) {
@@ -350,44 +372,107 @@
         function startPomodoro() {
             let workTime = parseInt(document.getElementById('workTime').value) * 60;
             let breakTime = parseInt(document.getElementById('breakTime').value) * 60;
-            let workSessions = getCookie('workSessions') || 0;
-            let breakSessions = getCookie('breakSessions') || 0;
+            let longBreakAfter = parseInt(document.getElementById('longBreakAfter').value);
+            let longBreakTime = parseInt(document.getElementById('longBreakTime').value) * 60;
 
-            if (isNaN(workTime) || isNaN(breakTime)) {
+            if (isNaN(workTime) || isNaN(breakTime) || isNaN(longBreakAfter) || isNaN(longBreakTime)) {
                 alert('Please enter valid times.');
                 return;
             }
 
-            alert(`Pomodoro started for ${workTime / 60} minutes. Take a break for ${breakTime / 60} minutes after!`);
+            let workSessions = parseInt(getCookie('workSessions')) || 0;
+            let breakSessions = parseInt(getCookie('breakSessions')) || 0;
+            let longBreakSessions = parseInt(getCookie('longBreakSessions')) || 0;
 
-            // Simulate work timer
-            setTimeout(() => {
-                workSessions++;
-                setCookie('workSessions', workSessions, 7);
-                alert('Work session completed! Start your break.');
-
-                // Simulate break timer
+            if (workSessions % longBreakAfter === 0 && workSessions !== 0) {
+                // Long break
+                alert('Time for a long break!');
+                playSound('breakSound');
                 setTimeout(() => {
-                    breakSessions++;
-                    setCookie('breakSessions', breakSessions, 7);
-                    alert('Break is over. Ready for another session?');
+                    longBreakSessions++;
+                    setCookie('longBreakSessions', longBreakSessions, 7);
                     displayPomodoroStats();
-                }, breakTime * 1000);
-            }, workTime * 1000);
+                }, longBreakTime * 1000);
+            } else {
+                // Regular break
+                playSound('pomodoroSound');
+                setTimeout(() => {
+                    workSessions++;
+                    setCookie('workSessions', workSessions, 7);
+                    alert('Work session completed! Start your break.');
+                    displayPomodoroStats();
+                }, workTime * 1000);
+            }
+
+            // Timer Display
+            endTime = new Date().getTime() + (workTime * 1000);
+            timerInterval = setInterval(updateTimerDisplay, 1000);
+        }
+
+        function updateTimerDisplay() {
+            let now = new Date().getTime();
+            let timeLeft = endTime - now;
+            let minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+            let seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+            document.getElementById('timerDisplay').innerHTML = `
+                Time Left: ${minutes}m ${seconds}s
+            `;
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                document.getElementById('timerDisplay').innerHTML = 'Time is up!';
+                playSound('pomodoroSound');
+            }
+        }
+
+        function playSound(soundId) {
+            document.getElementById(soundId).play();
         }
 
         function displayPomodoroStats() {
             let workSessions = getCookie('workSessions') || 0;
             let breakSessions = getCookie('breakSessions') || 0;
+            let longBreakSessions = getCookie('longBreakSessions') || 0;
+
+            // Use a basic graph library or manual rendering
+            let ctx = document.createElement('canvas').getContext('2d');
+            ctx.width = 400;
+            ctx.height = 200;
             document.getElementById('pomodoroStats').innerHTML = `
-                Work Sessions Completed: ${workSessions}<br>
-                Break Sessions Completed: ${breakSessions}
+                <canvas id="pomodoroChart" class="chart"></canvas>
             `;
+            let chart = new Chart(document.getElementById('pomodoroChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Work Sessions', 'Break Sessions', 'Long Breaks'],
+                    datasets: [{
+                        data: [workSessions, breakSessions, longBreakSessions],
+                        backgroundColor: ['#ffffff', '#ffffff', '#ffffff'],
+                        borderColor: ['#1d1d1f', '#1d1d1f', '#1d1d1f'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            grid: { display: false }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: { display: false }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
         }
 
         function resetPomodoroStats() {
             setCookie('workSessions', 0, 7);
             setCookie('breakSessions', 0, 7);
+            setCookie('longBreakSessions', 0, 7);
             displayPomodoroStats();
         }
 
@@ -396,5 +481,6 @@
             displayPomodoroStats();
         });
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>
 </html>
