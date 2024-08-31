@@ -93,8 +93,8 @@
             padding: 12px;
             border-bottom: 1px solid #dcdcdc;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            align-items: start;
         }
         .delete-btn {
             background-color: #ff3b30;
@@ -120,11 +120,11 @@
             color: #333;
         }
         .review-form {
+            margin-top: 10px;
             display: none;
-            margin-top: 20px;
         }
         .review-form input[type="radio"] {
-            margin-right: 10px;
+            margin-right: 5px;
         }
     </style>
 </head>
@@ -155,39 +155,6 @@
             </ul>
             <p>When reviewing a card, you grade your recall from 0 to 5, and the SM-2 algorithm updates n, EF, and I based on your grade.</p>
         </div>
-    </div>
-
-    <!-- Review Form Template -->
-    <div id="reviewForm" class="review-form">
-        <h3>Review Task</h3>
-        <form id="reviewFormContent">
-            <div>
-                <input type="radio" id="grade0" name="grade" value="0">
-                <label for="grade0">0: Total blackout</label>
-            </div>
-            <div>
-                <input type="radio" id="grade1" name="grade" value="1">
-                <label for="grade1">1: Incorrect, but familiar</label>
-            </div>
-            <div>
-                <input type="radio" id="grade2" name="grade" value="2">
-                <label for="grade2">2: Incorrect, but seemed easy</label>
-            </div>
-            <div>
-                <input type="radio" id="grade3" name="grade" value="3">
-                <label for="grade3">3: Correct, but with effort</label>
-            </div>
-            <div>
-                <input type="radio" id="grade4" name="grade" value="4">
-                <label for="grade4">4: Correct, with some hesitation</label>
-            </div>
-            <div>
-                <input type="radio" id="grade5" name="grade" value="5">
-                <label for="grade5">5: Correct, perfect recall</label>
-            </div>
-            <input type="button" value="Submit" onclick="submitReview()">
-            <input type="button" value="Cancel" onclick="cancelReview()">
-        </form>
     </div>
 
     <script>
@@ -255,7 +222,7 @@
                 tasksInCategory.forEach((task, index) => {
                     let nextReviewDate = calculateNextReviewDate(task.lastReview, task.I);
                     let li = document.createElement('li');
-                    li.innerHTML = `${task.text} - Next review: ${nextReviewDate} <button onclick="reviewTask(${tasks.indexOf(task)})">Review</button> <button class="delete-btn" onclick="deleteTask(${tasks.indexOf(task)})">Delete</button>`;
+                    li.innerHTML = `${task.text} - Next review: ${nextReviewDate} <button onclick="reviewTask(${tasks.indexOf(task)}, this)">Review</button> <button class="delete-btn" onclick="deleteTask(${tasks.indexOf(task)})">Delete</button>`;
                     taskList.appendChild(li);
                 });
             });
@@ -267,9 +234,27 @@
             return nextReview.toLocaleDateString();
         }
 
-        function reviewTask(index) {
+        function reviewTask(index, button) {
             currentTaskIndex = index;
-            document.getElementById('reviewForm').style.display = 'block';
+
+            // Hide existing review forms
+            document.querySelectorAll('.review-form').forEach(form => form.remove());
+
+            // Create review form
+            let reviewForm = document.createElement('div');
+            reviewForm.className = 'review-form';
+            reviewForm.innerHTML = `
+                <label><input type="radio" name="grade" value="0"> 0 - Total blackout</label><br>
+                <label><input type="radio" name="grade" value="1"> 1 - Incorrect, felt familiar</label><br>
+                <label><input type="radio" name="grade" value="2"> 2 - Incorrect, seemed easy</label><br>
+                <label><input type="radio" name="grade" value="3"> 3 - Correct, significant effort</label><br>
+                <label><input type="radio" name="grade" value="4"> 4 - Correct, some hesitation</label><br>
+                <label><input type="radio" name="grade" value="5"> 5 - Correct, perfect recall</label><br>
+                <button onclick="submitReview()">Submit</button>
+                <button onclick="cancelReview()">Cancel</button>
+            `;
+            button.parentNode.appendChild(reviewForm);
+            reviewForm.style.display = 'block';
         }
 
         function submitReview() {
@@ -287,15 +272,13 @@
                 tasks[currentTaskIndex] = task;
                 setCookie('tasks', JSON.stringify(tasks), 7);
                 displayTasks();
-                cancelReview(); // Hide the review form
             } else {
                 alert("Please select a grade.");
             }
         }
 
         function cancelReview() {
-            document.getElementById('reviewForm').style.display = 'none';
-            document.getElementById('reviewFormContent').reset(); // Reset the form
+            document.querySelectorAll('.review-form').forEach(form => form.remove());
         }
 
         function applySM2Algorithm(task, q) {
