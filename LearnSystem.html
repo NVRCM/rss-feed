@@ -83,6 +83,12 @@
             padding: 0;
             margin: 0;
         }
+        .category {
+            font-weight: bold;
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
+        }
         li {
             padding: 12px;
             border-bottom: 1px solid #dcdcdc;
@@ -112,6 +118,13 @@
             margin-top: 0;
             font-size: 20px;
             color: #333;
+        }
+        .review-form {
+            display: none;
+            margin-top: 20px;
+        }
+        .review-form input[type="radio"] {
+            margin-right: 10px;
         }
     </style>
 </head>
@@ -144,7 +157,42 @@
         </div>
     </div>
 
+    <!-- Review Form Template -->
+    <div id="reviewForm" class="review-form">
+        <h3>Review Task</h3>
+        <form id="reviewFormContent">
+            <div>
+                <input type="radio" id="grade0" name="grade" value="0">
+                <label for="grade0">0: Total blackout</label>
+            </div>
+            <div>
+                <input type="radio" id="grade1" name="grade" value="1">
+                <label for="grade1">1: Incorrect, but familiar</label>
+            </div>
+            <div>
+                <input type="radio" id="grade2" name="grade" value="2">
+                <label for="grade2">2: Incorrect, but seemed easy</label>
+            </div>
+            <div>
+                <input type="radio" id="grade3" name="grade" value="3">
+                <label for="grade3">3: Correct, but with effort</label>
+            </div>
+            <div>
+                <input type="radio" id="grade4" name="grade" value="4">
+                <label for="grade4">4: Correct, with some hesitation</label>
+            </div>
+            <div>
+                <input type="radio" id="grade5" name="grade" value="5">
+                <label for="grade5">5: Correct, perfect recall</label>
+            </div>
+            <input type="button" value="Submit" onclick="submitReview()">
+            <input type="button" value="Cancel" onclick="cancelReview()">
+        </form>
+    </div>
+
     <script>
+        let currentTaskIndex = null;
+
         function getCookie(name) {
             let value = "; " + document.cookie;
             let parts = value.split("; " + name + "=");
@@ -160,15 +208,21 @@
 
         function addTask() {
             let taskInput = document.getElementById('taskInput');
-            let task = taskInput.value.trim();
-            if (task) {
+            let taskText = taskInput.value.trim();
+            if (taskText) {
+                let category = extractCategory(taskText);
                 let tasks = getCookie('tasks');
                 tasks = tasks ? JSON.parse(tasks) : [];
-                tasks.push({ text: task, n: 0, EF: 2.5, I: 1, lastReview: new Date().toISOString() });
+                tasks.push({ text: taskText, category: category, n: 0, EF: 2.5, I: 1, lastReview: new Date().toISOString() });
                 setCookie('tasks', JSON.stringify(tasks), 7);
                 displayTasks();
                 taskInput.value = '';
             }
+        }
+
+        function extractCategory(taskText) {
+            let parts = taskText.split(' ');
+            return parts.length > 1 ? parts[0] : 'Uncategorized';
         }
 
         function displayTasks() {
@@ -176,14 +230,34 @@
             let tasks = getCookie('tasks');
             tasks = tasks ? JSON.parse(tasks) : [];
             taskList.innerHTML = '';
-            tasks.sort((a, b) => {
-                return new Date(a.nextReview) - new Date(b.nextReview);
-            });
-            tasks.forEach((task, index) => {
-                let nextReviewDate = calculateNextReviewDate(task.lastReview, task.I);
-                let li = document.createElement('li');
-                li.innerHTML = `${task.text} - Next review: ${nextReviewDate} <button onclick="reviewTask(${index})">Review</button> <button class="delete-btn" onclick="deleteTask(${index})">Delete</button>`;
-                taskList.appendChild(li);
+            
+            // Group tasks by category
+            let groupedTasks = tasks.reduce((acc, task) => {
+                if (!acc[task.category]) {
+                    acc[task.category] = [];
+                }
+                acc[task.category].push(task);
+                return acc;
+            }, {});
+
+            Object.keys(groupedTasks).forEach(category => {
+                let tasksInCategory = groupedTasks[category];
+                
+                let categoryHeader = document.createElement('div');
+                categoryHeader.className = 'category';
+                categoryHeader.textContent = category;
+                taskList.appendChild(categoryHeader);
+                
+                tasksInCategory.sort((a, b) => {
+                    return new Date(a.lastReview).getTime() + (a.I * 24 * 60 * 60 * 1000) - new Date(b.lastReview).getTime() - (b.I * 24 * 60 * 60 * 1000);
+                });
+                
+                tasksInCategory.forEach((task, index) => {
+                    let nextReviewDate = calculateNextReviewDate(task.lastReview, task.I);
+                    let li = document.createElement('li');
+                    li.innerHTML = `${task.text} - Next review: ${nextReviewDate} <button onclick="reviewTask(${tasks.indexOf(task)})">Review</button> <button class="delete-btn" onclick="deleteTask(${tasks.indexOf(task)})">Delete</button>`;
+                    taskList.appendChild(li);
+                });
             });
         }
 
@@ -194,23 +268,34 @@
         }
 
         function reviewTask(index) {
-            let tasks = getCookie('tasks');
-            tasks = tasks ? JSON.parse(tasks) : [];
-            let task = tasks[index];
-            let grade = prompt("Rate your recall (0-5):");
-            grade = parseInt(grade);
-            if (grade >= 0 && grade <= 5) {
+            currentTaskIndex = index;
+            document.getElementById('reviewForm').style.display = 'block';
+        }
+
+        function submitReview() {
+            let grade = document.querySelector('input[name="grade"]:checked');
+            if (grade) {
+                grade = parseInt(grade.value);
+                let tasks = getCookie('tasks');
+                tasks = tasks ? JSON.parse(tasks) : [];
+                let task = tasks[currentTaskIndex];
                 let { n, EF, I } = applySM2Algorithm(task, grade);
                 task.n = n;
                 task.EF = EF;
                 task.I = I;
                 task.lastReview = new Date().toISOString(); // Update the last review date
-                tasks[index] = task;
+                tasks[currentTaskIndex] = task;
                 setCookie('tasks', JSON.stringify(tasks), 7);
                 displayTasks();
+                cancelReview(); // Hide the review form
             } else {
-                alert("Invalid grade. Please enter a number between 0 and 5.");
+                alert("Please select a grade.");
             }
+        }
+
+        function cancelReview() {
+            document.getElementById('reviewForm').style.display = 'none';
+            document.getElementById('reviewFormContent').reset(); // Reset the form
         }
 
         function applySM2Algorithm(task, q) {
