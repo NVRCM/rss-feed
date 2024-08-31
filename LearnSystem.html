@@ -3,48 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Task Manager with SM-2 Algorithm</title>
+    <title>Task Manager with Pomodoro Timer</title>
     <style>
-        /* Resetting default margin and padding */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         /* Body styling */
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background-color: #f5f5f7;
-            color: #1c1c1e;
+            font-family: SF Pro Text, SF Pro Icons, Helvetica Neue, Helvetica, Arial, sans-serif;
+            color: rgb(29, 29, 31);
+            background-color: white;
             margin: 0;
-            padding: 0;
+            padding: 20px;
         }
 
         /* Header styling */
         header {
-            background: #ffffff;
-            padding: 20px;
             text-align: center;
-            border-bottom: 1px solid #d1d1d6;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgb(29, 29, 31);
+            margin-bottom: 20px;
         }
 
         h1 {
             font-size: 28px;
             font-weight: 600;
-            color: #1c1c1e;
-        }
-
-        /* Container styling */
-        .container {
-            width: 90%;
-            max-width: 600px;
-            margin: auto;
-            padding: 20px;
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            margin-top: 20px;
         }
 
         /* Form styling */
@@ -57,24 +37,26 @@
         input[type="text"] {
             flex: 1;
             padding: 14px;
-            border: 1px solid #d1d1d6;
-            border-radius: 10px;
+            border: 1px solid rgb(29, 29, 31);
+            border-radius: 8px;
             font-size: 16px;
+            color: rgb(29, 29, 31);
+            background-color: white;
         }
 
-        input[type="button"], .upload-btn {
-            padding: 14px 20px;
-            border: none;
-            border-radius: 10px;
-            background-color: #007aff;
-            color: white;
+        input[type="button"] {
+            padding: 12px 18px;
+            border: 1px solid rgb(29, 29, 31);
+            border-radius: 8px;
+            background-color: white;
+            color: rgb(29, 29, 31);
             font-size: 16px;
             cursor: pointer;
             transition: background-color 0.2s;
         }
 
-        input[type="button"]:hover, .upload-btn:hover {
-            background-color: #005bb5;
+        input[type="button"]:hover {
+            background-color: rgb(245, 245, 245);
         }
 
         input[type="file"] {
@@ -91,12 +73,11 @@
             font-weight: 600;
             margin-top: 20px;
             font-size: 18px;
-            color: #1c1c1e;
         }
 
         li {
             padding: 14px;
-            border-bottom: 1px solid #d1d1d6;
+            border-bottom: 1px solid rgb(29, 29, 31);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -104,33 +85,31 @@
         }
 
         li:hover {
-            background-color: #f0f0f5;
+            background-color: rgb(245, 245, 245);
         }
 
         .grade-btn, .delete-btn {
-            background-color: #007aff;
-            border: none;
-            color: white;
+            border: 1px solid rgb(29, 29, 31);
+            color: rgb(29, 29, 31);
             padding: 8px 16px;
-            border-radius: 10px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 14px;
+            background-color: white;
             transition: background-color 0.2s;
         }
 
         .grade-btn:hover, .delete-btn:hover {
-            background-color: #005bb5;
+            background-color: rgb(245, 245, 245);
         }
 
-        .delete-btn {
-            background-color: #ff3b30;
+        /* Save and upload button styling */
+        .fixed-btn-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
         }
 
-        .delete-btn:hover {
-            background-color: #d22a2a;
-        }
-
-        /* Description styling */
         .description {
             margin-top: 20px;
             font-size: 16px;
@@ -140,7 +119,23 @@
         .description h2 {
             margin-top: 0;
             font-size: 20px;
-            color: #1c1c1e;
+        }
+
+        /* Pomodoro Timer styling */
+        .pomodoro-timer {
+            border-top: 1px solid rgb(29, 29, 31);
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+
+        .pomodoro-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .pomodoro-stats {
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -149,35 +144,46 @@
         <h1>Task Manager</h1>
     </header>
 
-    <div class="container">
-        <!-- Form for adding tasks -->
-        <form id="taskForm">
-            <input type="text" id="taskInput" placeholder="Add a new task...">
-            <input type="button" value="Add Task" onclick="addTask()">
-        </form>
+    <!-- Form for adding tasks -->
+    <form id="taskForm">
+        <input type="text" id="taskInput" placeholder="Add a new task...">
+        <input type="button" value="Add Task" onclick="addTask()">
+    </form>
 
-        <!-- List for displaying tasks -->
-        <ul id="taskList"></ul>
+    <!-- List for displaying tasks -->
+    <ul id="taskList"></ul>
 
-        <!-- Save and upload buttons -->
+    <!-- Save and upload buttons -->
+    <div class="fixed-btn-container">
         <input type="button" value="Save Tasks" onclick="saveTasks()">
         <label for="fileInput" class="upload-btn">Upload Tasks</label>
         <input type="file" id="fileInput" onchange="loadTasks(event)" accept=".json">
-
-        <!-- Description of the SM-2 algorithm -->
-        <div class="description">
-            <h2>SM-2 Algorithm Description</h2>
-            <p>The SM-2 algorithm is used for spaced repetition, a technique to enhance long-term memory retention. It tracks the following properties for each card:</p>
-            <ul>
-                <li><strong>Repetition number (n)</strong>: Number of times the card has been successfully recalled in a row.</li>
-                <li><strong>Easiness factor (EF)</strong>: Indicates how "easy" the card is, starting at 2.5.</li>
-                <li><strong>Inter-repetition interval (I)</strong>: The time (in days) before the card is reviewed again.</li>
-            </ul>
-            <p>When reviewing a card, you grade your recall from 0 to 5, and the SM-2 algorithm updates n, EF, and I based on your grade.</p>
-        </div>
     </div>
 
-    <!-- JavaScript functions for task management and SM-2 algorithm -->
+    <!-- Pomodoro Timer -->
+    <div class="pomodoro-timer">
+        <h2>Pomodoro Timer</h2>
+        <div class="pomodoro-controls">
+            <input type="number" id="workTime" placeholder="Work Time (min)" value="25">
+            <input type="number" id="breakTime" placeholder="Break Time (min)" value="5">
+            <input type="button" value="Start Timer" onclick="startPomodoro()">
+            <input type="button" value="Reset Statistics" onclick="resetPomodoroStats()">
+        </div>
+        <div class="pomodoro-stats" id="pomodoroStats"></div>
+    </div>
+
+    <!-- Description of the SM-2 algorithm -->
+    <div class="description">
+        <h2>SM-2 Algorithm Description</h2>
+        <p>The SM-2 algorithm is used for spaced repetition, a technique to enhance long-term memory retention. It tracks the following properties for each card:</p>
+        <ul>
+            <li><strong>Repetition number (n)</strong>: Number of times the card has been successfully recalled in a row.</li>
+            <li><strong>Easiness factor (EF)</strong>: Indicates how "easy" the card is, starting at 2.5.</li>
+            <li><strong>Inter-repetition interval (I)</strong>: The time (in days) before the card is reviewed again.</li>
+        </ul>
+        <p>When reviewing a card, you grade your recall from 0 to 5, and the SM-2 algorithm updates n, EF, and I based on your grade.</p>
+    </div>
+
     <script>
         function getCookie(name) {
             let value = "; " + document.cookie;
@@ -240,45 +246,26 @@
                 tasksInCategory.forEach((task, index) => {
                     let nextReviewDate = calculateNextReviewDate(task.lastReview, task.I);
                     let li = document.createElement('li');
-                    li.innerHTML = `${task.text} - Next review: ${nextReviewDate}`;
-                    let reviewButton = document.createElement('button');
-                    reviewButton.textContent = 'Review';
-                    reviewButton.className = 'grade-btn';
-                    reviewButton.onclick = function() {
-                        showGradingButtons(task, tasks.indexOf(task), li);
-                    };
-                    li.appendChild(reviewButton);
-
-                    let deleteButton = document.createElement('button');
-                    deleteButton.textContent = 'Delete';
-                    deleteButton.className = 'delete-btn';
-                    deleteButton.onclick = function() {
-                        deleteTask(tasks.indexOf(task));
-                    };
-                    li.appendChild(deleteButton);
-
+                    li.innerHTML = `
+                        ${task.text} - Next Review: ${nextReviewDate.toDateString()}
+                        <div>
+                            <button class="grade-btn" onclick="gradeTask(${index}, 5)">5</button>
+                            <button class="grade-btn" onclick="gradeTask(${index}, 4)">4</button>
+                            <button class="grade-btn" onclick="gradeTask(${index}, 3)">3</button>
+                            <button class="grade-btn" onclick="gradeTask(${index}, 2)">2</button>
+                            <button class="grade-btn" onclick="gradeTask(${index}, 1)">1</button>
+                            <button class="grade-btn" onclick="gradeTask(${index}, 0)">0</button>
+                            <button class="delete-btn" onclick="deleteTask(${index})">Delete</button>
+                        </div>`;
                     taskList.appendChild(li);
                 });
             });
         }
 
         function calculateNextReviewDate(lastReview, interval) {
-            let nextReview = new Date(lastReview);
-            nextReview.setDate(nextReview.getDate() + interval);
-            return nextReview.toDateString();
-        }
-
-        function showGradingButtons(task, index, li) {
-            li.innerHTML = `${task.text} - Grade: `;
-            for (let q = 0; q <= 5; q++) {
-                let gradeButton = document.createElement('button');
-                gradeButton.textContent = q;
-                gradeButton.className = 'grade-btn';
-                gradeButton.onclick = function() {
-                    gradeTask(index, q);
-                };
-                li.appendChild(gradeButton);
-            }
+            let reviewDate = new Date(lastReview);
+            reviewDate.setDate(reviewDate.getDate() + interval);
+            return reviewDate;
         }
 
         function gradeTask(index, q) {
@@ -359,8 +346,54 @@
             reader.readAsText(input.files[0]);
         }
 
+        // Pomodoro Timer Functions
+        function startPomodoro() {
+            let workTime = parseInt(document.getElementById('workTime').value) * 60;
+            let breakTime = parseInt(document.getElementById('breakTime').value) * 60;
+            let workSessions = getCookie('workSessions') || 0;
+            let breakSessions = getCookie('breakSessions') || 0;
+
+            if (isNaN(workTime) || isNaN(breakTime)) {
+                alert('Please enter valid times.');
+                return;
+            }
+
+            alert(`Pomodoro started for ${workTime / 60} minutes. Take a break for ${breakTime / 60} minutes after!`);
+
+            // Simulate work timer
+            setTimeout(() => {
+                workSessions++;
+                setCookie('workSessions', workSessions, 7);
+                alert('Work session completed! Start your break.');
+
+                // Simulate break timer
+                setTimeout(() => {
+                    breakSessions++;
+                    setCookie('breakSessions', breakSessions, 7);
+                    alert('Break is over. Ready for another session?');
+                    displayPomodoroStats();
+                }, breakTime * 1000);
+            }, workTime * 1000);
+        }
+
+        function displayPomodoroStats() {
+            let workSessions = getCookie('workSessions') || 0;
+            let breakSessions = getCookie('breakSessions') || 0;
+            document.getElementById('pomodoroStats').innerHTML = `
+                Work Sessions Completed: ${workSessions}<br>
+                Break Sessions Completed: ${breakSessions}
+            `;
+        }
+
+        function resetPomodoroStats() {
+            setCookie('workSessions', 0, 7);
+            setCookie('breakSessions', 0, 7);
+            displayPomodoroStats();
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             displayTasks();
+            displayPomodoroStats();
         });
     </script>
 </body>
