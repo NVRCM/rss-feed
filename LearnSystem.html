@@ -262,24 +262,43 @@
             let newTaskInput = document.getElementById('newTaskInput');
             let newTaskText = newTaskInput.value.trim();
             if (newTaskText) {
-                let [taskName, slides, steps, start] = newTaskText.split(' ');
-                slides = parseInt(slides);
-                steps = parseInt(steps);
-                start = start ? parseInt(start) : 1; // Default start value is now 1
-
-                let tasks = getCookie('tasks');
-                tasks = tasks ? JSON.parse(tasks) : [];
-
-                for (let i = start; i <= slides; i += steps) {
-                    tasks.push({ text: `${taskName} ${i}`, n: 0, EF: 2.5, I: 1, lastReview: new Date().toISOString() });
+                let parts = newTaskText.split(' ');
+                let taskName = parts[0];
+                if (parts.length === 2) {
+                    // Case for adding a single task
+                    let taskNumber = parts[1];
+                    addSingleTask(taskName, taskNumber);
+                } else if (parts.length >= 3) {
+                    // Case for adding multiple tasks
+                    let slides = parseInt(parts[1]);
+                    let steps = parseInt(parts[2]);
+                    let start = parts[3] ? parseInt(parts[3]) : 1; // Default start value is now 1
+                    addMultipleTasks(taskName, slides, steps, start);
+                } else {
+                    showMessage('Please enter valid task details.');
                 }
-
-                setCookie('tasks', JSON.stringify(tasks), 7);
                 newTaskInput.value = '';
-                displayTasks();
             } else {
                 showMessage('Please enter valid task details.');
             }
+        }
+
+        function addSingleTask(taskName, taskNumber) {
+            let tasks = getCookie('tasks');
+            tasks = tasks ? JSON.parse(tasks) : [];
+            tasks.push({ text: `${taskName} ${taskNumber}`, n: 0, EF: 2.5, I: 1, lastReview: new Date().toISOString() });
+            setCookie('tasks', JSON.stringify(tasks), 7);
+            displayTasks();
+        }
+
+        function addMultipleTasks(taskName, slides, steps, start) {
+            let tasks = getCookie('tasks');
+            tasks = tasks ? JSON.parse(tasks) : [];
+            for (let i = start; i <= slides; i += steps) {
+                tasks.push({ text: `${taskName} ${i}`, n: 0, EF: 2.5, I: 1, lastReview: new Date().toISOString() });
+            }
+            setCookie('tasks', JSON.stringify(tasks), 7);
+            displayTasks();
         }
 
         function showMessage(message) {
