@@ -9,7 +9,7 @@
             font-family: SF Pro Text, SF Pro Icons, Helvetica Neue, Helvetica, Arial, sans-serif;
             color: rgb(29, 29, 31);
             margin: 0;
-            padding: 0 20px; /* Add padding for whitespace on the left and right */
+            padding: 0 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -17,15 +17,15 @@
 
         #taskList {
             display: flex;
-            flex-wrap: wrap; /* Allows wrapping into columns */
+            flex-wrap: wrap;
             list-style-type: none;
             padding: 0;
             width: 100%;
         }
 
         .task-group {
-            margin-bottom: 20px; /* Space between groups */
-            width: 50%; /* Adjust width for column display */
+            width: 200px; /* Fixed width for each column */
+            margin: 10px; /* Spacing between columns */
         }
 
         .task-group.collapsed .task-item {
@@ -34,12 +34,12 @@
 
         .task-group-title {
             font-weight: bold;
-            margin-bottom: 10px; /* Space between title and tasks */
-            cursor: pointer; /* Indicate that the title is clickable */
+            margin-bottom: 10px;
+            cursor: pointer;
         }
 
         .task-item {
-            margin-bottom: 5px; /* Adjust space between tasks */
+            margin-bottom: 5px;
         }
 
         input[type="button"], button {
@@ -76,9 +76,8 @@
         <button onclick="document.getElementById('uploadInput').click()">Upload Tasks</button>
     </div>
 
-    <!-- Task input field initially hidden -->
     <div id="addTaskContainer" class="hidden">
-        <input type="text" id="newTaskInput" placeholder="Enter task name, slides, steps, start" />
+        <input type="text" id="newTaskInput" placeholder="Enter task name, slides, steps, start (optional)" />
         <button onclick="addTasks()">Add</button>
     </div>
 
@@ -133,7 +132,7 @@
                     let taskItem = document.createElement('div');
                     taskItem.className = 'task-item';
                     taskItem.innerHTML = `
-                        ${task.text.split(' ')[1]} ${nextReviewDate.toLocaleDateString()}<br/>
+                        ${task.text.split(' ')[1]} ${nextReviewDate.toLocaleDateString()} 
                         <button onclick="showGrades('${group}', ${index})">Review</button>
                         <button onclick="deleteTask('${group}', ${index})">Delete</button>`;
                     groupContainer.appendChild(taskItem);
@@ -266,7 +265,7 @@
                 let [taskName, slides, steps, start] = newTaskText.split(' ');
                 slides = parseInt(slides);
                 steps = parseInt(steps);
-                start = start ? parseInt(start) : 0;
+                start = start ? parseInt(start) : 1; // Default start value is now 1
 
                 let tasks = getCookie('tasks');
                 tasks = tasks ? JSON.parse(tasks) : [];
