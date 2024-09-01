@@ -9,13 +9,15 @@
             font-family: SF Pro Text, SF Pro Icons, Helvetica Neue, Helvetica, Arial, sans-serif;
             color: rgb(29, 29, 31);
             margin: 0;
-            padding: 0 20px; /* Add padding for more whitespace on the left and right */
+            padding: 0 20px; /* Add padding for whitespace on the left and right */
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
         #taskList {
+            display: flex;
+            flex-wrap: wrap; /* Allows wrapping into columns */
             list-style-type: none;
             padding: 0;
             width: 100%;
@@ -23,11 +25,17 @@
 
         .task-group {
             margin-bottom: 20px; /* Space between groups */
+            width: 50%; /* Adjust width for column display */
+        }
+
+        .task-group.collapsed .task-item {
+            display: none; /* Hide tasks when collapsed */
         }
 
         .task-group-title {
             font-weight: bold;
             margin-bottom: 10px; /* Space between title and tasks */
+            cursor: pointer; /* Indicate that the title is clickable */
         }
 
         .task-item {
@@ -70,8 +78,8 @@
 
     <!-- Task input field initially hidden -->
     <div id="addTaskContainer" class="hidden">
-        <input type="text" id="newTaskInput" placeholder="Enter task name" />
-        <button onclick="addTask()">Add</button>
+        <input type="text" id="newTaskInput" placeholder="Enter task name, slides, steps, start" />
+        <button onclick="addTasks()">Add</button>
     </div>
 
     <script>
@@ -93,8 +101,8 @@
         function displayTasks() {
             let tasks = getCookie('tasks');
             tasks = tasks ? JSON.parse(tasks) : [];
-            
-            // Group tasks by prefix
+
+            // Group tasks by prefix and sort them alphabetically
             let groupedTasks = {};
             tasks.forEach(task => {
                 let prefix = task.text.split(' ')[0]; // Get the prefix before the first space
@@ -107,13 +115,17 @@
             let taskList = document.getElementById('taskList');
             taskList.innerHTML = '';
 
-            Object.keys(groupedTasks).forEach(group => {
+            // Sort group names alphabetically
+            Object.keys(groupedTasks).sort().forEach(group => {
                 let groupContainer = document.createElement('div');
                 groupContainer.className = 'task-group';
                 
                 let groupTitle = document.createElement('div');
                 groupTitle.className = 'task-group-title';
                 groupTitle.textContent = group; // Group name (prefix)
+                groupTitle.onclick = function() {
+                    groupContainer.classList.toggle('collapsed'); // Toggle collapsed class on click
+                };
                 groupContainer.appendChild(groupTitle);
 
                 groupedTasks[group].forEach((task, index) => {
@@ -121,11 +133,9 @@
                     let taskItem = document.createElement('div');
                     taskItem.className = 'task-item';
                     taskItem.innerHTML = `
-                        ${task.text} - Next Review: ${nextReviewDate.toLocaleDateString()}
-                        <div>
-                            <button onclick="showGrades('${group}', ${index})">Review</button>
-                            <button onclick="deleteTask('${group}', ${index})">Delete</button>
-                        </div>`;
+                        ${task.text.split(' ')[1]} ${nextReviewDate.toLocaleDateString()}<br/>
+                        <button onclick="showGrades('${group}', ${index})">Review</button>
+                        <button onclick="deleteTask('${group}', ${index})">Delete</button>`;
                     groupContainer.appendChild(taskItem);
                 });
 
@@ -166,7 +176,6 @@
             let tasks = getCookie('tasks');
             tasks = tasks ? JSON.parse(tasks) : [];
 
-            // Find the task by group
             let groupTasks = tasks.filter(task => task.text.startsWith(group));
             let task = groupTasks[index];
 
@@ -177,7 +186,7 @@
                 task.I = I;
                 task.lastReview = new Date().toISOString();
 
-                tasks = tasks.map(t => t.text.startsWith(group) && t.text === task.text ? task : t); // Update task in the list
+                tasks = tasks.map(t => t.text.startsWith(group) && t.text === task.text ? task : t);
                 setCookie('tasks', JSON.stringify(tasks), 7);
                 displayTasks();
             } else {
@@ -211,7 +220,6 @@
             let tasks = getCookie('tasks');
             tasks = tasks ? JSON.parse(tasks) : [];
 
-            // Filter out the task from the group
             let taskToDelete = tasks.filter(task => task.text.startsWith(group))[index];
             tasks = tasks.filter(task => task !== taskToDelete);
 
@@ -235,18 +243,15 @@
         }
 
         function loadTasks(event) {
-            let input = event.target;
-            let reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    let tasks = JSON.parse(e.target.result);
-                    setCookie('tasks', JSON.stringify(tasks), 7);
+            let file = event.target.files[0];
+            if (file) {
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    setCookie('tasks', e.target.result, 7);
                     displayTasks();
-                } catch (error) {
-                    showMessage('Error parsing JSON file.');
-                }
-            };
-            reader.readAsText(input.files[0]);
+                };
+                reader.readAsText(file);
+            }
         }
 
         function toggleAddTaskInput() {
@@ -254,18 +259,27 @@
             addTaskContainer.classList.toggle('hidden');
         }
 
-        function addTask() {
+        function addTasks() {
             let newTaskInput = document.getElementById('newTaskInput');
             let newTaskText = newTaskInput.value.trim();
             if (newTaskText) {
+                let [taskName, slides, steps, start] = newTaskText.split(' ');
+                slides = parseInt(slides);
+                steps = parseInt(steps);
+                start = start ? parseInt(start) : 0;
+
                 let tasks = getCookie('tasks');
                 tasks = tasks ? JSON.parse(tasks) : [];
-                tasks.push({ text: newTaskText, n: 0, EF: 2.5, I: 1, lastReview: new Date().toISOString() });
+
+                for (let i = start; i <= slides; i += steps) {
+                    tasks.push({ text: `${taskName} ${i}`, n: 0, EF: 2.5, I: 1, lastReview: new Date().toISOString() });
+                }
+
                 setCookie('tasks', JSON.stringify(tasks), 7);
                 newTaskInput.value = '';
                 displayTasks();
             } else {
-                showMessage('Please enter a valid task.');
+                showMessage('Please enter valid task details.');
             }
         }
 
