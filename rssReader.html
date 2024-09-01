@@ -64,7 +64,7 @@
         }
 
         async function loadRSS() {
-            const feedUrl = 'https://rss.cnn.com/rss/edition.rss'; // Example RSS feed URL
+            const feedUrl = 'https://nvrcm.github.io/rss-feed/rss_feed.xml'; 
             const xml = await fetchRSS(feedUrl);
             if (xml) {
                 displayRSS(xml);
