@@ -21,7 +21,16 @@
             width: 100%;
         }
 
-        #taskList li {
+        .task-group {
+            margin-bottom: 20px; /* Space between groups */
+        }
+
+        .task-group-title {
+            font-weight: bold;
+            margin-bottom: 10px; /* Space between title and tasks */
+        }
+
+        .task-item {
             margin-bottom: 5px; /* Adjust space between tasks */
         }
 
@@ -84,22 +93,43 @@
         function displayTasks() {
             let tasks = getCookie('tasks');
             tasks = tasks ? JSON.parse(tasks) : [];
+            
+            // Group tasks by prefix
+            let groupedTasks = {};
+            tasks.forEach(task => {
+                let prefix = task.text.split(' ')[0]; // Get the prefix before the first space
+                if (!groupedTasks[prefix]) {
+                    groupedTasks[prefix] = [];
+                }
+                groupedTasks[prefix].push(task);
+            });
+
             let taskList = document.getElementById('taskList');
             taskList.innerHTML = '';
 
-            tasks.sort((a, b) => {
-                return new Date(a.lastReview).getTime() + (a.I * 24 * 60 * 60 * 1000) -
-                       (new Date(b.lastReview).getTime() + (b.I * 24 * 60 * 60 * 1000));
-            }).forEach((task, index) => {
-                let nextReviewDate = calculateNextReviewDate(task.lastReview, task.I);
-                let li = document.createElement('li');
-                li.innerHTML = `
-                    ${task.text} - Next Review: ${nextReviewDate.toLocaleDateString()}
-                    <div>
-                        <button onclick="showGrades(${index})">Review</button>
-                        <button onclick="deleteTask(${index})">Delete</button>
-                    </div>`;
-                taskList.appendChild(li);
+            Object.keys(groupedTasks).forEach(group => {
+                let groupContainer = document.createElement('div');
+                groupContainer.className = 'task-group';
+                
+                let groupTitle = document.createElement('div');
+                groupTitle.className = 'task-group-title';
+                groupTitle.textContent = group; // Group name (prefix)
+                groupContainer.appendChild(groupTitle);
+
+                groupedTasks[group].forEach((task, index) => {
+                    let nextReviewDate = calculateNextReviewDate(task.lastReview, task.I);
+                    let taskItem = document.createElement('div');
+                    taskItem.className = 'task-item';
+                    taskItem.innerHTML = `
+                        ${task.text} - Next Review: ${nextReviewDate.toLocaleDateString()}
+                        <div>
+                            <button onclick="showGrades('${group}', ${index})">Review</button>
+                            <button onclick="deleteTask('${group}', ${index})">Delete</button>
+                        </div>`;
+                    groupContainer.appendChild(taskItem);
+                });
+
+                taskList.appendChild(groupContainer);
             });
         }
 
@@ -109,33 +139,45 @@
             return reviewDate;
         }
 
-        function showGrades(index) {
+        function showGrades(group, index) {
             let taskList = document.getElementById('taskList');
-            let items = taskList.querySelectorAll('li');
-            let item = items[index];
+            let groupContainers = taskList.getElementsByClassName('task-group');
+            let groupContainer;
+            for (let container of groupContainers) {
+                if (container.querySelector('.task-group-title').textContent === group) {
+                    groupContainer = container;
+                    break;
+                }
+            }
+            let taskItem = groupContainer.getElementsByClassName('task-item')[index];
             let gradesHtml = `
                 <div>
-                    <button onclick="gradeTask(${index}, 5)">5</button>
-                    <button onclick="gradeTask(${index}, 4)">4</button>
-                    <button onclick="gradeTask(${index}, 3)">3</button>
-                    <button onclick="gradeTask(${index}, 2)">2</button>
-                    <button onclick="gradeTask(${index}, 1)">1</button>
-                    <button onclick="gradeTask(${index}, 0)">0</button>
+                    <button onclick="gradeTask('${group}', ${index}, 5)">5</button>
+                    <button onclick="gradeTask('${group}', ${index}, 4)">4</button>
+                    <button onclick="gradeTask('${group}', ${index}, 3)">3</button>
+                    <button onclick="gradeTask('${group}', ${index}, 2)">2</button>
+                    <button onclick="gradeTask('${group}', ${index}, 1)">1</button>
+                    <button onclick="gradeTask('${group}', ${index}, 0)">0</button>
                 </div>`;
-            item.innerHTML = item.innerHTML.replace('Review', 'Done') + gradesHtml;
+            taskItem.innerHTML = taskItem.innerHTML.replace('Review', 'Done') + gradesHtml;
         }
 
-        function gradeTask(index, q) {
+        function gradeTask(group, index, q) {
             let tasks = getCookie('tasks');
             tasks = tasks ? JSON.parse(tasks) : [];
-            let task = tasks[index];
+
+            // Find the task by group
+            let groupTasks = tasks.filter(task => task.text.startsWith(group));
+            let task = groupTasks[index];
+
             if (q >= 0 && q <= 5) {
                 let { n, EF, I } = applySM2Algorithm(task, q);
                 task.n = n;
                 task.EF = EF;
                 task.I = I;
                 task.lastReview = new Date().toISOString();
-                tasks[index] = task;
+
+                tasks = tasks.map(t => t.text.startsWith(group) && t.text === task.text ? task : t); // Update task in the list
                 setCookie('tasks', JSON.stringify(tasks), 7);
                 displayTasks();
             } else {
@@ -165,10 +207,14 @@
             return { n, EF, I };
         }
 
-        function deleteTask(index) {
+        function deleteTask(group, index) {
             let tasks = getCookie('tasks');
             tasks = tasks ? JSON.parse(tasks) : [];
-            tasks.splice(index, 1);
+
+            // Filter out the task from the group
+            let taskToDelete = tasks.filter(task => task.text.startsWith(group))[index];
+            tasks = tasks.filter(task => task !== taskToDelete);
+
             setCookie('tasks', JSON.stringify(tasks), 7);
             displayTasks();
         }
@@ -205,33 +251,29 @@
 
         function toggleAddTaskInput() {
             let addTaskContainer = document.getElementById('addTaskContainer');
-            if (addTaskContainer.classList.contains('hidden')) {
-                addTaskContainer.classList.remove('hidden');
-            } else {
-                addTaskContainer.classList.add('hidden');
-            }
+            addTaskContainer.classList.toggle('hidden');
         }
 
         function addTask() {
-            let taskText = document.getElementById('newTaskInput').value.trim();
-            if (taskText === "") {
-                showMessage("Task name cannot be empty.");
-                return;
+            let newTaskInput = document.getElementById('newTaskInput');
+            let newTaskText = newTaskInput.value.trim();
+            if (newTaskText) {
+                let tasks = getCookie('tasks');
+                tasks = tasks ? JSON.parse(tasks) : [];
+                tasks.push({ text: newTaskText, n: 0, EF: 2.5, I: 1, lastReview: new Date().toISOString() });
+                setCookie('tasks', JSON.stringify(tasks), 7);
+                newTaskInput.value = '';
+                displayTasks();
+            } else {
+                showMessage('Please enter a valid task.');
             }
-            let tasks = getCookie('tasks');
-            tasks = tasks ? JSON.parse(tasks) : [];
-            tasks.push({ text: taskText, n: 0, EF: 2.5, I: 1, lastReview: new Date().toISOString() });
-            setCookie('tasks', JSON.stringify(tasks), 7);
-            document.getElementById('newTaskInput').value = "";
-            toggleAddTaskInput();
-            displayTasks();
         }
 
         function showMessage(message) {
             document.getElementById('message').textContent = message;
         }
 
-        displayTasks();
+        document.addEventListener('DOMContentLoaded', displayTasks);
     </script>
 </body>
 </html>
