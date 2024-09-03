@@ -6,296 +6,260 @@
     <title>Learning System</title>
     <style>
         body {
-            font-family: SF Pro Text, SF Pro Icons, Helvetica Neue, Helvetica, Arial, sans-serif;
-            color: rgb(29, 29, 31);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             margin: 0;
-            padding: 0 40px;
+            padding: 0;
+            box-sizing: border-box;
             display: flex;
             flex-direction: column;
             align-items: center;
+            background-color: #f5f5f5;
         }
-
-        #taskList {
+        .container {
+            width: 80%;
+            max-width: 1200px;
+            margin-top: 20px;
+        }
+        .section {
+            display: inline-block;
+            margin-right: 10px;
+            vertical-align: top;
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .section h2 {
+            margin: 0;
+            font-size: 16px;
+            text-align: center;
+        }
+        .task {
             display: flex;
-            flex-wrap: wrap;
-            list-style-type: none;
-            padding: 0;
-            width: 100%;
+            justify-content: space-between;
+            padding: 5px 0;
         }
-
-        .task-group {
-            width: 200px; /* Fixed width for each column */
-            margin: 10px; /* Spacing between columns */
-        }
-
-        .task-group.collapsed .task-item {
-            display: none; /* Hide tasks when collapsed */
-        }
-
-        .task-group-title {
-            font-weight: bold;
-            margin-bottom: 10px;
-            cursor: pointer;
-        }
-
-        .task-item {
-            margin-bottom: 5px;
-        }
-
-        input[type="button"], button {
-            background: none;
+        .task button {
             border: none;
-            color: rgb(29, 29, 31);
+            background: none;
             cursor: pointer;
-            margin: 5px;
+            font-size: 14px;
+            color: #007aff;
         }
-
-        .bottom-right-buttons {
+        .controls {
             position: fixed;
             bottom: 20px;
             right: 20px;
         }
-
-        .hidden {
-            display: none;
+        .controls button {
+            border: none;
+            background-color: #007aff;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 5px;
         }
-
-        #message {
-            margin-top: 10px;
+        .input-container {
+            display: flex;
+            align-items: center;
+        }
+        .input-container input {
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 5px;
         }
     </style>
 </head>
 <body>
-    <ul id="taskList"></ul>
-    <div id="message"></div>
+    <div class="container" id="container">
+        <!-- Sections and tasks will be added here -->
+    </div>
+    <div class="controls">
+        <button id="addBtn">Add</button>
+        <button id="downloadBtn">Download</button>
+        <button id="uploadBtn">Upload</button>
+        <div id="inputContainer" class="input-container" style="display:none;">
+            <input type="text" id="taskInput" placeholder="StringSectionName IntTaskName [IntSteps IntFirstTaskName]">
+        </div>
+    </div>
     
-    <div class="bottom-right-buttons">
-        <button onclick="toggleAddTaskInput()">Add Task</button>
-        <button onclick="saveTasks()">Save Tasks</button>
-        <input type="file" id="uploadInput" onchange="loadTasks(event)" class="hidden">
-        <button onclick="document.getElementById('uploadInput').click()">Upload Tasks</button>
-    </div>
-
-    <div id="addTaskContainer" class="hidden">
-        <input type="text" id="newTaskInput" placeholder="Enter task name, slides, steps, start (optional)" />
-        <button onclick="addTasks()">Add</button>
-    </div>
-
     <script>
-        function getCookie(name) {
-            let matches = document.cookie.match(new RegExp('(?:^|; )' + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + '=([^;]*)'));
-            return matches ? decodeURIComponent(matches[1]) : undefined;
-        }
-
+        // Utility functions
         function setCookie(name, value, days) {
             let expires = "";
             if (days) {
-                let date = new Date();
+                const date = new Date();
                 date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
                 expires = "; expires=" + date.toUTCString();
             }
             document.cookie = name + "=" + (value || "") + expires + "; path=/";
         }
 
-        function displayTasks() {
-            let tasks = getCookie('tasks');
-            tasks = tasks ? JSON.parse(tasks) : [];
+        function getCookie(name) {
+            const nameEQ = name + "=";
+            const ca = document.cookie.split(';');
+            for(let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+                if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+            }
+            return null;
+        }
 
-            // Check the current date and adjust review dates accordingly
-            adjustReviewDates(tasks);
+        function deleteCookie(name) {
+            document.cookie = name + '=; Max-Age=-99999999;';
+        }
 
-            // Group tasks by prefix and sort them alphabetically
-            let groupedTasks = {};
-            tasks.forEach(task => {
-                let prefix = task.text.split(' ')[0]; // Get the prefix before the first space
-                if (!groupedTasks[prefix]) {
-                    groupedTasks[prefix] = [];
+        function formatDate(date) {
+            return date.toISOString().split('T')[0];
+        }
+
+        // Handle adding tasks
+        function addTasks(sectionName, startTask, endTask, steps, firstTask) {
+            const container = document.getElementById('container');
+            let section = document.querySelector(`.section[data-name="${sectionName}"]`);
+            if (!section) {
+                section = document.createElement('div');
+                section.className = 'section';
+                section.dataset.name = sectionName;
+                section.innerHTML = `<h2>${sectionName}</h2>`;
+                container.appendChild(section);
+            }
+            const taskNames = [];
+            if (steps && firstTask) {
+                for (let i = 0; i <= (endTask - startTask) / steps; i++) {
+                    taskNames.push(firstTask + i * steps);
                 }
-                groupedTasks[prefix].push(task);
+            } else {
+                for (let i = startTask; i <= endTask; i++) {
+                    taskNames.push(i);
+                }
+            }
+            taskNames.forEach(taskName => {
+                const taskDiv = document.createElement('div');
+                taskDiv.className = 'task';
+                const reviewDate = new Date();
+                reviewDate.setDate(reviewDate.getDate());
+                taskDiv.innerHTML = `
+                    Task ${taskName} - Review: ${formatDate(reviewDate)}
+                    <div>
+                        <button onclick="gradeTask(this)">G</button>
+                        <button onclick="deleteTask(this)">D</button>
+                    </div>
+                `;
+                section.appendChild(taskDiv);
             });
+        }
 
-            let taskList = document.getElementById('taskList');
-            taskList.innerHTML = '';
-
-            // Sort group names alphabetically
-            Object.keys(groupedTasks).sort().forEach(group => {
-                let groupContainer = document.createElement('div');
-                groupContainer.className = 'task-group';
-                
-                let groupTitle = document.createElement('div');
-                groupTitle.className = 'task-group-title';
-                groupTitle.textContent = group; // Group name (prefix)
-                groupTitle.onclick = function() {
-                    groupContainer.classList.toggle('collapsed'); // Toggle collapsed class on click
-                };
-                groupContainer.appendChild(groupTitle);
-
-                groupedTasks[group].forEach((task, index) => {
-                    let nextReviewDate = calculateNextReviewDate(task.lastReview, task.I);
-                    let taskItem = document.createElement('div');
-                    taskItem.className = 'task-item';
-                    taskItem.innerHTML = `
-                        ${task.text.split(' ')[1]} ${nextReviewDate.toLocaleDateString()} 
-                        <button onclick="showGrades('${group}', ${index})">Review</button>
-                        <button onclick="deleteTask('${group}', ${index})">Delete</button>`;
-                    groupContainer.appendChild(taskItem);
+        function loadTasks() {
+            const tasks = getCookie('tasks');
+            if (tasks) {
+                const taskList = JSON.parse(tasks);
+                taskList.forEach(task => {
+                    addTasks(task.section, task.startTask, task.endTask, task.steps, task.firstTask);
                 });
-
-                taskList.appendChild(groupContainer);
-            });
-        }
-
-        function calculateNextReviewDate(lastReview, interval) {
-            let reviewDate = new Date(lastReview);
-            reviewDate.setDate(reviewDate.getDate() + interval);
-            return reviewDate;
-        }
-
-        function adjustReviewDates(tasks) {
-            let today = new Date();
-            tasks.forEach(task => {
-                let lastReviewDate = new Date(task.lastReview);
-                let diffDays = Math.ceil((today - lastReviewDate) / (1000 * 60 * 60 * 24));
-
-                // Adjust review dates based on the grading algorithm
-                if (task.q === 0) {
-                    task.I = 0; // Review today
-                } else if (task.q === 1) {
-                    task.I = 1; // Review tomorrow
-                } else if (task.q === 2) {
-                    // Sequence 1, 2, 3, ... days
-                    task.I = (task.n || 1) + 1;
-                    task.n = (task.n || 0) + 1;
-                }
-
-                // Update the task
-                task.lastReview = today.toISOString();
-            });
-        }
-
-        function showGrades(group, index) {
-            let taskList = document.getElementById('taskList');
-            let groupContainers = taskList.getElementsByClassName('task-group');
-            let groupContainer;
-            for (let container of groupContainers) {
-                if (container.querySelector('.task-group-title').textContent === group) {
-                    groupContainer = container;
-                    break;
-                }
             }
-            let taskItem = groupContainer.getElementsByClassName('task-item')[index];
-            let gradesHtml = `
-                <div>
-                    <button onclick="gradeTask('${group}', ${index}, 2)">2</button>
-                    <button onclick="gradeTask('${group}', ${index}, 1)">1</button>
-                    <button onclick="gradeTask('${group}', ${index}, 0)">0</button>
-                </div>`;
-            taskItem.innerHTML = taskItem.innerHTML.replace('Review', 'Done') + gradesHtml;
-        }
-
-        function gradeTask(group, index, q) {
-            let tasks = getCookie('tasks');
-            tasks = tasks ? JSON.parse(tasks) : [];
-
-            let groupTasks = tasks.filter(task => task.text.startsWith(group));
-            let task = groupTasks[index];
-
-            // Apply new algorithm logic
-            let { n, I } = applyCustomAlgorithm(task, q);
-            task.n = n;
-            task.I = I;
-            task.q = q; // Save the current grade
-            task.lastReview = new Date().toISOString();
-
-            tasks = tasks.map(t => t.text.startsWith(group) && t.text === task.text ? task : t);
-            setCookie('tasks', JSON.stringify(tasks), 7);
-            displayTasks();
-        }
-
-        function applyCustomAlgorithm(task, q) {
-            let { n, I } = task;
-
-            // New grading logic
-            if (q === 0) {
-                I = 0; // Review today
-            } else if (q === 1) {
-                I = 1; // Review tomorrow
-            } else if (q === 2) {
-                I = (n || 1) + 1; // Incremental increase: 1, 2, 3, ...
-                n = (n || 0) + 1;
-            }
-
-            return { n, I };
-        }
-
-        function toggleAddTaskInput() {
-            let addTaskContainer = document.getElementById('addTaskContainer');
-            addTaskContainer.classList.toggle('hidden');
-        }
-
-        function addTasks() {
-            let newTaskInput = document.getElementById('newTaskInput');
-            let newTaskText = newTaskInput.value.trim();
-            if (newTaskText) {
-                let parts = newTaskText.split(' ');
-                let taskName = parts[0];
-                let taskNumber;
-
-                let tasks = getCookie('tasks');
-                tasks = tasks ? JSON.parse(tasks) : [];
-
-                if (parts.length === 2) {
-                    taskNumber = parts[1];
-                    tasks.push({ text: `${taskName} ${taskNumber}`, n: 0, I: 1, q: 0, lastReview: new Date().toISOString() });
-                } else if (parts.length >= 3) {
-                    let [slides, steps, start] = parts.slice(1);
-                    let currentSlide = parseInt(start || '1', 10);
-                    for (let i = currentSlide; i <= parseInt(slides); i += parseInt(steps)) {
-                        tasks.push({ text: `${taskName} ${i}`, n: 0, I: 1, q: 0, lastReview: new Date().toISOString() });
-                    }
-                }
-
-                setCookie('tasks', JSON.stringify(tasks), 7);
-                displayTasks();
-                newTaskInput.value = '';
-                toggleAddTaskInput();
-            }
-        }
-
-        function deleteTask(group, index) {
-            let tasks = getCookie('tasks');
-            tasks = tasks ? JSON.parse(tasks) : [];
-            tasks = tasks.filter(task => !(task.text.startsWith(group) && tasks.filter(task => task.text.startsWith(group)).indexOf(task) === index));
-            setCookie('tasks', JSON.stringify(tasks), 7);
-            displayTasks();
         }
 
         function saveTasks() {
-            let tasks = getCookie('tasks');
-            if (tasks) {
-                let blob = new Blob([tasks], { type: 'application/json' });
-                let url = URL.createObjectURL(blob);
-                let a = document.createElement('a');
-                a.href = url;
-                a.download = 'tasks.json';
-                a.click();
-                URL.revokeObjectURL(url);
-            }
+            const taskList = [];
+            document.querySelectorAll('.section').forEach(section => {
+                const sectionName = section.dataset.name;
+                section.querySelectorAll('.task').forEach(taskDiv => {
+                    const taskText = taskDiv.textContent.split(' - ')[0].replace('Task ', '');
+                    const reviewDate = taskDiv.querySelector('button').nextSibling.textContent.split('Review: ')[1];
+                    taskList.push({
+                        section: sectionName,
+                        taskName: taskText,
+                        reviewDate: reviewDate
+                    });
+                });
+            });
+            setCookie('tasks', JSON.stringify(taskList), 1);
         }
 
-        function loadTasks(event) {
-            let file = event.target.files[0];
+        function downloadData() {
+            const tasks = getCookie('tasks');
+            const blob = new Blob([tasks], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'tasks.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        function uploadData(event) {
+            const file = event.target.files[0];
             if (file) {
-                let reader = new FileReader();
+                const reader = new FileReader();
                 reader.onload = function(e) {
-                    setCookie('tasks', e.target.result, 7);
-                    displayTasks();
+                    const data = JSON.parse(e.target.result);
+                    data.forEach(task => {
+                        addTasks(task.section, parseInt(task.startTask), parseInt(task.endTask), task.steps, task.firstTask);
+                    });
                 };
                 reader.readAsText(file);
             }
         }
 
-        displayTasks(); // Initial display on load
+        function gradeTask(button) {
+            const taskDiv = button.closest('.task');
+            const reviewDate = taskDiv.querySelector('div').textContent.split('Review: ')[1];
+            const currentDate = new Date();
+            const reviewDateObj = new Date(reviewDate);
+            let nextReviewDate;
+
+            switch (button.textContent) {
+                case '0':
+                    nextReviewDate = currentDate;
+                    break;
+                case '1':
+                    nextReviewDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
+                    break;
+                case '2':
+                    nextReviewDate = new Date(currentDate.setDate(currentDate.getDate() + (Math.pow(2, (parseInt(button.textContent) - 2)) * 2)));
+                    break;
+            }
+            taskDiv.querySelector('div').textContent = `Review: ${formatDate(nextReviewDate)}`;
+            saveTasks();
+        }
+
+        function deleteTask(button) {
+            button.closest('.task').remove();
+            saveTasks();
+        }
+
+        document.getElementById('addBtn').addEventListener('click', () => {
+            document.getElementById('inputContainer').style.display = 'flex';
+        });
+
+        document.getElementById('taskInput').addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                const input = event.target.value.trim();
+                const parts = input.split(' ');
+                if (parts.length >= 2) {
+                    const sectionName = parts[0];
+                    const startTask = parseInt(parts[1]);
+                    const endTask = parts.length >= 3 ? parseInt(parts[2]) : startTask;
+                    const steps = parts.length === 4 ? parseInt(parts[2]) : null;
+                    const firstTask = parts.length === 4 ? parseInt(parts[3]) : null;
+                    addTasks(sectionName, startTask, endTask, steps, firstTask);
+                    event.target.value = '';
+                    document.getElementById('inputContainer').style.display = 'none';
+                    saveTasks();
+                }
+            }
+        });
+
+        document.getElementById('downloadBtn').addEventListener('click', downloadData);
+        document.getElementById('uploadBtn').addEventListener('change', uploadData);
+
+        // Initialize page
+        loadTasks();
     </script>
 </body>
 </html>
