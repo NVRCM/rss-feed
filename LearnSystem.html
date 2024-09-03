@@ -9,7 +9,7 @@
             font-family: SF Pro Text, SF Pro Icons, Helvetica Neue, Helvetica, Arial, sans-serif;
             color: rgb(29, 29, 31);
             margin: 0;
-            padding: 0 20px;
+            padding: 0 40px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -161,8 +161,6 @@
             let taskItem = groupContainer.getElementsByClassName('task-item')[index];
             let gradesHtml = `
                 <div>
-                    <button onclick="gradeTask('${group}', ${index}, 5)">5</button>
-                    <button onclick="gradeTask('${group}', ${index}, 4)">4</button>
                     <button onclick="gradeTask('${group}', ${index}, 3)">3</button>
                     <button onclick="gradeTask('${group}', ${index}, 2)">2</button>
                     <button onclick="gradeTask('${group}', ${index}, 1)">1</button>
@@ -178,79 +176,34 @@
             let groupTasks = tasks.filter(task => task.text.startsWith(group));
             let task = groupTasks[index];
 
-            if (q >= 0 && q <= 5) {
-                let { n, EF, I } = applySM2Algorithm(task, q);
-                task.n = n;
-                task.EF = EF;
-                task.I = I;
-                task.lastReview = new Date().toISOString();
+            // Apply new algorithm logic
+            let { n, I } = applyCustomAlgorithm(task, q);
+            task.n = n;
+            task.I = I;
+            task.lastReview = new Date().toISOString();
 
-                tasks = tasks.map(t => t.text.startsWith(group) && t.text === task.text ? task : t);
-                setCookie('tasks', JSON.stringify(tasks), 7);
-                displayTasks();
-            } else {
-                showMessage("Invalid grade. Please enter a number between 0 and 5.");
-            }
-        }
-
-        function applySM2Algorithm(task, q) {
-            let { n, EF, I } = task;
-            if (q >= 3) {
-                if (n === 0) {
-                    I = 1;
-                } else if (n === 1) {
-                    I = 6;
-                } else {
-                    I = Math.round(I * EF);
-                }
-                n++;
-            } else {
-                n = 0;
-                I = 1;
-            }
-            EF = EF + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02));
-            if (EF < 1.3) {
-                EF = 1.3;
-            }
-            return { n, EF, I };
-        }
-
-        function deleteTask(group, index) {
-            let tasks = getCookie('tasks');
-            tasks = tasks ? JSON.parse(tasks) : [];
-
-            let taskToDelete = tasks.filter(task => task.text.startsWith(group))[index];
-            tasks = tasks.filter(task => task !== taskToDelete);
-
+            tasks = tasks.map(t => t.text.startsWith(group) && t.text === task.text ? task : t);
             setCookie('tasks', JSON.stringify(tasks), 7);
             displayTasks();
         }
 
-        function saveTasks() {
-            let tasks = getCookie('tasks');
-            if (tasks) {
-                let blob = new Blob([tasks], { type: 'application/json' });
-                let url = URL.createObjectURL(blob);
-                let a = document.createElement('a');
-                a.href = url;
-                a.download = 'tasks.json';
-                a.click();
-                URL.revokeObjectURL(url);
-            } else {
-                showMessage('No tasks to save.');
-            }
-        }
+        function applyCustomAlgorithm(task, q) {
+            let { n, I } = task;
 
-        function loadTasks(event) {
-            let file = event.target.files[0];
-            if (file) {
-                let reader = new FileReader();
-                reader.onload = function(e) {
-                    setCookie('tasks', e.target.result, 7);
-                    displayTasks();
-                };
-                reader.readAsText(file);
+            // New grading logic
+            if (q === 0) {
+                I = 0; // Review today
+            } else if (q === 1) {
+                I = 1; // Review tomorrow
+            } else if (q === 2) {
+                I = n + 1; // Incremental increase: 1, 2, 3, ...
+                n++;
+            } else if (q === 3) {
+                I = (n * 2) + 1; // Incremental increase: 1, 3, 5, 7, ...
+                n++;
             }
+
+            return { n, I };
         }
 
         function toggleAddTaskInput() {
@@ -286,7 +239,7 @@
         function addSingleTask(taskName, taskNumber) {
             let tasks = getCookie('tasks');
             tasks = tasks ? JSON.parse(tasks) : [];
-            tasks.push({ text: `${taskName} ${taskNumber}`, n: 0, EF: 2.5, I: 1, lastReview: new Date().toISOString() });
+            tasks.push({ text: `${taskName} ${taskNumber}`, n: 0, I: 1, lastReview: new Date().toISOString() });
             setCookie('tasks', JSON.stringify(tasks), 7);
             displayTasks();
         }
@@ -295,17 +248,52 @@
             let tasks = getCookie('tasks');
             tasks = tasks ? JSON.parse(tasks) : [];
             for (let i = start; i <= slides; i += steps) {
-                tasks.push({ text: `${taskName} ${i}`, n: 0, EF: 2.5, I: 1, lastReview: new Date().toISOString() });
+                tasks.push({ text: `${taskName} ${i}`, n: 0, I: 1, lastReview: new Date().toISOString() });
             }
             setCookie('tasks', JSON.stringify(tasks), 7);
             displayTasks();
         }
 
-        function showMessage(message) {
-            document.getElementById('message').textContent = message;
+        function deleteTask(group, index) {
+            let tasks = getCookie('tasks');
+            tasks = tasks ? JSON.parse(tasks) : [];
+            tasks = tasks.filter(task => !(task.text.startsWith(group) && tasks.filter(task => task.text.startsWith(group)).indexOf(task) === index));
+            setCookie('tasks', JSON.stringify(tasks), 7);
+            displayTasks();
         }
 
-        document.addEventListener('DOMContentLoaded', displayTasks);
+        function saveTasks() {
+            let tasks = getCookie('tasks');
+            if (tasks) {
+                let blob = new Blob([tasks], { type: 'application/json' });
+                let url = URL.createObjectURL(blob);
+                let a = document.createElement('a');
+                a.href = url;
+                a.download = 'tasks.json';
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+        }
+
+        function loadTasks(event) {
+            let file = event.target.files[0];
+            if (file) {
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    setCookie('tasks', e.target.result, 7);
+                    displayTasks();
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        function showMessage(msg) {
+            let messageDiv = document.getElementById('message');
+            messageDiv.textContent = msg;
+            setTimeout(() => messageDiv.textContent = '', 3000);
+        }
+
+        displayTasks(); // Initial display
     </script>
 </body>
 </html>
