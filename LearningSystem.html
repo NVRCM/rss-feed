@@ -158,16 +158,14 @@
                 let diffDays = Math.ceil((today - lastReviewDate) / (1000 * 60 * 60 * 24));
 
                 // Adjust review dates based on the grading algorithm
-                if (task.q === 0 || diffDays >= task.I) {
+                if (task.q === 0) {
                     task.I = 0; // Review today
                 } else if (task.q === 1) {
                     task.I = 1; // Review tomorrow
                 } else if (task.q === 2) {
-                    let daysToAdd = Math.ceil(diffDays / task.I) * (task.n + 1);
-                    task.I = daysToAdd;
-                } else if (task.q === 3) {
-                    let daysToAdd = (task.n * 2) + 1; // 1, 3, 5, 7, ...
-                    task.I = daysToAdd;
+                    // Sequence 1, 2, 3, ... days
+                    task.I = (task.n || 1) + 1;
+                    task.n = (task.n || 0) + 1;
                 }
 
                 // Update the task
@@ -188,7 +186,6 @@
             let taskItem = groupContainer.getElementsByClassName('task-item')[index];
             let gradesHtml = `
                 <div>
-                    <button onclick="gradeTask('${group}', ${index}, 3)">3</button>
                     <button onclick="gradeTask('${group}', ${index}, 2)">2</button>
                     <button onclick="gradeTask('${group}', ${index}, 1)">1</button>
                     <button onclick="gradeTask('${group}', ${index}, 0)">0</button>
@@ -224,11 +221,8 @@
             } else if (q === 1) {
                 I = 1; // Review tomorrow
             } else if (q === 2) {
-                I = n + 1; // Incremental increase: 1, 2, 3, ...
-                n++;
-            } else if (q === 3) {
-                I = (n * 2) + 1; // Incremental increase: 1, 3, 5, 7, ...
-                n++;
+                I = (n || 1) + 1; // Incremental increase: 1, 2, 3, ...
+                n = (n || 0) + 1;
             }
 
             return { n, I };
@@ -245,24 +239,22 @@
             if (newTaskText) {
                 let parts = newTaskText.split(' ');
                 let taskName = parts[0];
+                let taskNumber;
+
+                let tasks = getCookie('tasks');
+                tasks = tasks ? JSON.parse(tasks) : [];
+
                 if (parts.length === 2) {
-                    // Case for adding a single task
-                    let taskNumber = parts[1];
-                    let tasks = getCookie('tasks');
-                    tasks = tasks ? JSON.parse(tasks) : [];
+                    taskNumber = parts[1];
                     tasks.push({ text: `${taskName} ${taskNumber}`, n: 0, I: 1, q: 0, lastReview: new Date().toISOString() });
-                    setCookie('tasks', JSON.stringify(tasks), 7);
                 } else if (parts.length >= 3) {
-                    // Case for multiple tasks
-                    let [taskName, slides, steps, start] = parts;
-                    let tasks = getCookie('tasks');
-                    tasks = tasks ? JSON.parse(tasks) : [];
+                    let [slides, steps, start] = parts.slice(1);
                     let currentSlide = parseInt(start || '1', 10);
                     for (let i = currentSlide; i <= parseInt(slides); i += parseInt(steps)) {
                         tasks.push({ text: `${taskName} ${i}`, n: 0, I: 1, q: 0, lastReview: new Date().toISOString() });
                     }
-                    setCookie('tasks', JSON.stringify(tasks), 7);
                 }
+
                 setCookie('tasks', JSON.stringify(tasks), 7);
                 displayTasks();
                 newTaskInput.value = '';
