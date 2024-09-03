@@ -13,21 +13,21 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            background-color: #f5f5f5;
+            background-color: #fff;
+            color: #000;
         }
         .container {
             width: 80%;
             max-width: 1200px;
             margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
         }
         .section {
             display: inline-block;
             margin-right: 10px;
             vertical-align: top;
-            background-color: #fff;
             padding: 10px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
         .section h2 {
             margin: 0;
@@ -38,22 +38,29 @@
             display: flex;
             justify-content: space-between;
             padding: 5px 0;
+            align-items: center;
         }
         .task button {
             border: none;
             background: none;
             cursor: pointer;
             font-size: 14px;
-            color: #007aff;
+            color: #000;
+            margin-left: 5px;
+        }
+        .task .grading-buttons {
+            display: none;
         }
         .controls {
             position: fixed;
             bottom: 20px;
             right: 20px;
+            display: flex;
+            align-items: center;
         }
         .controls button {
             border: none;
-            background-color: #007aff;
+            background-color: #000;
             color: #fff;
             padding: 10px;
             border-radius: 5px;
@@ -63,12 +70,17 @@
         .input-container {
             display: flex;
             align-items: center;
+            margin-left: 10px;
         }
         .input-container input {
             padding: 5px;
-            border: 1px solid #ccc;
+            border: 1px solid #000;
             border-radius: 5px;
-            margin-right: 5px;
+            margin-left: 5px;
+        }
+        .grading-buttons {
+            display: flex;
+            gap: 5px;
         }
     </style>
 </head>
@@ -78,10 +90,9 @@
     </div>
     <div class="controls">
         <button id="addBtn">Add</button>
-        <button id="downloadBtn">Download</button>
-        <button id="uploadBtn">Upload</button>
-        <div id="inputContainer" class="input-container" style="display:none;">
+        <div id="inputContainer" class="input-container">
             <input type="text" id="taskInput" placeholder="StringSectionName IntTaskName [IntSteps IntFirstTaskName]">
+            <button id="submitBtn">Add</button>
         </div>
     </div>
     
@@ -116,7 +127,6 @@
             return date.toISOString().split('T')[0];
         }
 
-        // Handle adding tasks
         function addTasks(sectionName, startTask, endTask, steps, firstTask) {
             const container = document.getElementById('container');
             let section = document.querySelector(`.section[data-name="${sectionName}"]`);
@@ -127,9 +137,11 @@
                 section.innerHTML = `<h2>${sectionName}</h2>`;
                 container.appendChild(section);
             }
+            // Remove existing tasks
+            section.querySelectorAll('.task').forEach(taskDiv => taskDiv.remove());
             const taskNames = [];
             if (steps && firstTask) {
-                for (let i = 0; i <= (endTask - startTask) / steps; i++) {
+                for (let i = 0; i <= (endTask - firstTask) / steps; i++) {
                     taskNames.push(firstTask + i * steps);
                 }
             } else {
@@ -145,12 +157,22 @@
                 taskDiv.innerHTML = `
                     Task ${taskName} - Review: ${formatDate(reviewDate)}
                     <div>
-                        <button onclick="gradeTask(this)">G</button>
+                        <button onclick="toggleGrading(this)">G</button>
                         <button onclick="deleteTask(this)">D</button>
+                        <div class="grading-buttons">
+                            <button onclick="gradeTask(this, 0)">0</button>
+                            <button onclick="gradeTask(this, 1)">1</button>
+                            <button onclick="gradeTask(this, 2)">2</button>
+                        </div>
                     </div>
                 `;
                 section.appendChild(taskDiv);
             });
+            // Remove section if no tasks are present
+            if (section.querySelectorAll('.task').length === 0) {
+                section.remove();
+            }
+            saveTasks();
         }
 
         function loadTasks() {
@@ -158,7 +180,7 @@
             if (tasks) {
                 const taskList = JSON.parse(tasks);
                 taskList.forEach(task => {
-                    addTasks(task.section, task.startTask, task.endTask, task.steps, task.firstTask);
+                    addTasks(task.section, parseInt(task.startTask), parseInt(task.endTask), task.steps, task.firstTask);
                 });
             }
         }
@@ -169,7 +191,7 @@
                 const sectionName = section.dataset.name;
                 section.querySelectorAll('.task').forEach(taskDiv => {
                     const taskText = taskDiv.textContent.split(' - ')[0].replace('Task ', '');
-                    const reviewDate = taskDiv.querySelector('button').nextSibling.textContent.split('Review: ')[1];
+                    const reviewDate = taskDiv.querySelector('div').textContent.split('Review: ')[1];
                     taskList.push({
                         section: sectionName,
                         taskName: taskText,
@@ -206,21 +228,26 @@
             }
         }
 
-        function gradeTask(button) {
+        function toggleGrading(button) {
+            const gradingButtons = button.parentNode.querySelector('.grading-buttons');
+            gradingButtons.style.display = gradingButtons.style.display === 'none' ? 'flex' : 'none';
+        }
+
+        function gradeTask(button, grade) {
             const taskDiv = button.closest('.task');
             const reviewDate = taskDiv.querySelector('div').textContent.split('Review: ')[1];
             const currentDate = new Date();
             const reviewDateObj = new Date(reviewDate);
             let nextReviewDate;
 
-            switch (button.textContent) {
-                case '0':
+            switch (grade) {
+                case 0:
                     nextReviewDate = currentDate;
                     break;
-                case '1':
+                case 1:
                     nextReviewDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
                     break;
-                case '2':
+                case 2:
                     nextReviewDate = new Date(currentDate.setDate(currentDate.getDate() + (Math.pow(2, (parseInt(button.textContent) - 2)) * 2)));
                     break;
             }
@@ -230,6 +257,10 @@
 
         function deleteTask(button) {
             button.closest('.task').remove();
+            const section = button.closest('.section');
+            if (section.querySelectorAll('.task').length === 0) {
+                section.remove();
+            }
             saveTasks();
         }
 
@@ -237,21 +268,24 @@
             document.getElementById('inputContainer').style.display = 'flex';
         });
 
+        document.getElementById('submitBtn').addEventListener('click', () => {
+            const input = document.getElementById('taskInput').value.trim();
+            const parts = input.split(' ');
+            if (parts.length >= 2) {
+                const sectionName = parts[0];
+                const startTask = parseInt(parts[1]);
+                const endTask = parts.length >= 3 ? parseInt(parts[2]) : startTask;
+                const steps = parts.length === 4 ? parseInt(parts[2]) : null;
+                const firstTask = parts.length === 4 ? parseInt(parts[3]) : null;
+                addTasks(sectionName, startTask, endTask, steps, firstTask);
+                document.getElementById('taskInput').value = '';
+                document.getElementById('inputContainer').style.display = 'none';
+            }
+        });
+
         document.getElementById('taskInput').addEventListener('keydown', (event) => {
             if (event.key === 'Enter') {
-                const input = event.target.value.trim();
-                const parts = input.split(' ');
-                if (parts.length >= 2) {
-                    const sectionName = parts[0];
-                    const startTask = parseInt(parts[1]);
-                    const endTask = parts.length >= 3 ? parseInt(parts[2]) : startTask;
-                    const steps = parts.length === 4 ? parseInt(parts[2]) : null;
-                    const firstTask = parts.length === 4 ? parseInt(parts[3]) : null;
-                    addTasks(sectionName, startTask, endTask, steps, firstTask);
-                    event.target.value = '';
-                    document.getElementById('inputContainer').style.display = 'none';
-                    saveTasks();
-                }
+                document.getElementById('submitBtn').click();
             }
         });
 
