@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px;
+        }
+        #task-sections {
+            display: flex;
+            justify-content: flex-start;
+            flex-wrap: wrap;
+            gap: 20px;
+            width: 100%;
+        }
+        .section-column {
+            border: 1px solid #ddd;
+            padding: 10px;
+            width: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .task-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px;
+            margin-bottom: 5px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+        }
+        #controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Task Management</h1>
+    <div id="task-sections"></div>
+    <div id="controls">
+        <button id="add-button">Add</button>
+        <input type="text" id="task-input" class="hidden" placeholder="Enter task">
+        <button id="download-button">Download</button>
+        <button id="upload-button">Upload</button>
+        <input type="file" id="upload-file" class="hidden">
+    </div>
+
+    <script>
+        const tasks = {};
+        const currentDate = new Date().toLocaleDateString();
+        const taskInput = document.getElementById('task-input');
+        const uploadFileInput = document.getElementById('upload-file');
+
+        function addTask(section, taskName) {
+            if (!tasks[section]) {
+                tasks[section] = [];
+            }
+            tasks[section].push({ name: taskName, reviewDate: currentDate, grade: null });
+            tasks[section].sort((a, b) => parseInt(b.name.split(' ')[1]) - parseInt(a.name.split(' ')[1]));
+            renderSections();
+            saveTasksToCookies();
+        }
+
+        function renderSections() {
+            const taskSectionsDiv = document.getElementById('task-sections');
+            taskSectionsDiv.innerHTML = '';
+
+            const sortedSections = Object.keys(tasks).sort();
+            for (const section of sortedSections) {
+                const sectionDiv = document.createElement('div');
+                sectionDiv.classList.add('section-column');
+                sectionDiv.innerHTML = `<h3>Section ${section}</h3>`;
+
+                tasks[section].forEach(task => {
+                    const taskDiv = document.createElement('div');
+                    taskDiv.classList.add('task-item');
+                    taskDiv.innerHTML = `
+                        <span>${task.name} (Review: ${task.reviewDate})</span>
+                        <input type="number" min="0" max="2" value="${task.grade || ''}" onchange="updateTaskGrade('${section}', '${task.name}', this.value)">
+                    `;
+                    sectionDiv.appendChild(taskDiv);
+                });
+
+                taskSectionsDiv.appendChild(sectionDiv);
+            }
+        }
+
+        function updateTaskGrade(section, taskName, grade) {
+            const task = tasks[section].find(t => t.name === taskName);
+            if (!task) return;
+
+            task.grade = parseInt(grade);
+            const currentReviewDate = new Date(task.reviewDate);
+            const newReviewDate = new Date(currentReviewDate);
+
+            if (task.grade === 0) {
+                task.reviewDate = new Date().toLocaleDateString();
+            } else if (task.grade === 1) {
+                newReviewDate.setDate(currentReviewDate.getDate() + 1);
+                task.reviewDate = newReviewDate.toLocaleDateString();
+            } else if (task.grade === 2) {
+                let daysToAdd = 1;
+                while (tasks[section].some(t => t.name === taskName && t.grade === 2)) {
+                    daysToAdd += 1;
+                }
+                newReviewDate.setDate(currentReviewDate.getDate() + daysToAdd);
+                task.reviewDate = newReviewDate.toLocaleDateString();
+            }
+
+            renderSections();
+            saveTasksToCookies();
+        }
+
+        function saveTasksToCookies() {
+            document.cookie = "tasks=" + encodeURIComponent(JSON.stringify(tasks)) + ";path=/";
+        }
+
+        function loadTasksFromCookies() {
+            const cookieValue = document.cookie.split('; ').find(row => row.startsWith('tasks='));
+            if (cookieValue) {
+                const cookieTasks = JSON.parse(decodeURIComponent(cookieValue.split('=')[1]));
+                Object.assign(tasks, cookieTasks);
+                renderSections();
+            }
+        }
+
+        document.getElementById('add-button').onclick = () => {
+            taskInput.classList.toggle('hidden');
+            taskInput.focus();
+        };
+
+        taskInput.onkeypress = (e) => {
+            if (e.key === 'Enter') {
+                processTaskInput();
+            }
+        };
+
+        document.getElementById('download-button').onclick = () => {
+            const blob = new Blob([JSON.stringify(tasks)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'tasks.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        };
+
+        document.getElementById('upload-button').onclick = () => {
+            uploadFileInput.click();
+        };
+
+        uploadFileInput.onchange = (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = () => {
+                const uploadedTasks = JSON.parse(reader.result);
+                Object.assign(tasks, uploadedTasks);
+                renderSections();
+                saveTasksToCookies();
+            };
+            reader.readAsText(file);
+        };
+
+        function processTaskInput() {
+            const inputText = taskInput.value.trim();
+            if (!inputText) return;
+
+            const [section, ...numbers] = inputText.split(' ');
+            if (!section || numbers.length === 0) return;
+
+            const sortedNumbers = numbers.sort((a, b) => b - a);
+            sortedNumbers.forEach((num, index) => addTask(section, `Task ${num}`));
+
+            taskInput.value = '';
+            taskInput.classList.add('hidden');
+        }
+
+        loadTasksFromCookies();
+    </script>
+</body>
+</html>
