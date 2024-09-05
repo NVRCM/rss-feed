@@ -21,15 +21,11 @@
             list-style-type: none;
             padding: 0;
             width: calc(100% - 40px); /* Adjusted width with padding */
-            box-sizing: border-box;
         }
 
         .task-group {
             width: 200px; /* Fixed width for each column */
             margin: 10px; /* Spacing between columns */
-            border: 1px solid rgb(29, 29, 31);
-            padding: 10px;
-            box-sizing: border-box;
         }
 
         .task-group.collapsed .task-item {
@@ -179,24 +175,21 @@
             let task = groupTasks[index];
 
             task.lastReview = new Date();
-            let nextReviewDate = new Date();
-
             if (grade === 0 || new Date(task.nextReviewDate) < new Date()) {
-                nextReviewDate = new Date(); // Review today
+                task.nextReviewDate = new Date(); // Review today
             } else if (grade === 1) {
-                nextReviewDate = new Date(task.lastReview);
-                nextReviewDate.setDate(task.lastReview.getDate() + 1); // Review tomorrow
+                task.nextReviewDate = new Date(task.lastReview);
+                task.nextReviewDate.setDate(task.lastReview.getDate() + 1); // Review tomorrow
             } else if (grade === 2) {
                 let daysToAdd = 1;
                 for (let i = 0; i < (task.grades || 0); i++) {
                     daysToAdd += 2 * i;
                 }
-                nextReviewDate = new Date(task.lastReview);
-                nextReviewDate.setDate(task.lastReview.getDate() + daysToAdd); // Review after calculated days
+                task.nextReviewDate = new Date(task.lastReview);
+                task.nextReviewDate.setDate(task.lastReview.getDate() + daysToAdd); // Review after calculated days
                 task.grades = (task.grades || 0) + 1;
             }
 
-            task.nextReviewDate = nextReviewDate.toISOString(); // Store as ISO string
             tasks = tasks.map(t => t.text.startsWith(group) && t.text === task.text ? task : t);
             setCookie('tasks', JSON.stringify(tasks), 7);
             displayTasks();
@@ -248,7 +241,6 @@
         function addTasks() {
             let newTaskInput = document.getElementById('newTaskInput');
             let newTaskText = newTaskInput.value.trim();
-
             if (newTaskText) {
                 let parts = newTaskText.split(' ');
                 let taskName = parts[0];
@@ -257,31 +249,15 @@
                 let start = parseInt(parts[3], 10) || 1;
 
                 if (taskName && !isNaN(slides) && !isNaN(steps)) {
-                    let tasks = getCookie('tasks');
-                    tasks = tasks ? JSON.parse(tasks) : [];
-
-                    for (let i = start; i <= slides; i += steps) {
-                        tasks.push({
-                            text: `${taskName} ${i}`,
-                            lastReview: null,
-                            nextReviewDate: new Date().toISOString()
-                        });
-                    }
-                    setCookie('tasks', JSON.stringify(tasks), 7);
-                    displayTasks();
-                    newTaskInput.value = '';
-                    toggleAddTaskInput();
+                    addMultipleTasks(taskName, slides, steps, start);
                 } else {
                     showMessage('Please enter valid task details.');
                 }
+                newTaskInput.value = '';
+                toggleAddTaskInput();
             } else {
                 showMessage('Please enter valid task details.');
             }
-        }
-
-        function showMessage(message) {
-            let messageDiv = document.getElementById('message');
-            messageDiv.textContent = message;
         }
 
         document.addEventListener('DOMContentLoaded', displayTasks);
