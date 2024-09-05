@@ -184,7 +184,7 @@
                 let currentInterval = task.interval || 1;
                 nextReviewDate.setDate(today.getDate() + currentInterval);
                 task.nextReview = nextReviewDate.toISOString();
-                task.interval = currentInterval + 2; // Increment the interval by 2 each time
+                task.interval = currentInterval * 2; // Double the interval each time
             }
 
             tasks = tasks.map(t => t.text.startsWith(group) && t.text === task.text ? task : t);
@@ -276,6 +276,11 @@
             }
             setCookie('tasks', JSON.stringify(tasks), 7);
             displayTasks();
+        }
+
+        function showMessage(message) {
+            let messageDiv = document.getElementById('message');
+            messageDiv.textContent = message;
         }
 
         document.addEventListener('DOMContentLoaded', displayTasks);
