@@ -128,11 +128,10 @@
                 groupContainer.appendChild(groupTitle);
 
                 groupedTasks[group].forEach((task, index) => {
-                    let nextReviewDate = new Date(task.nextReview);
                     let taskItem = document.createElement('div');
                     taskItem.className = 'task-item';
                     taskItem.innerHTML = `
-                        ${task.text.split(' ')[1]} ${nextReviewDate.toLocaleDateString()} 
+                        ${task.text.split(' ')[1]} ${task.nextReviewDate.toLocaleDateString()} 
                         <button onclick="showGrades('${group}', ${index})">Review</button>
                         <button onclick="deleteTask('${group}', ${index})">Delete</button>`;
                     groupContainer.appendChild(taskItem);
@@ -169,22 +168,20 @@
             let groupTasks = tasks.filter(task => task.text.startsWith(group));
             let task = groupTasks[index];
 
-            let today = new Date();
-            let nextReviewDate = new Date(task.nextReview);
-
-            if (grade === 0 || nextReviewDate < today) {
-                // Grade 0 or missed review date
-                task.nextReview = today.toISOString();
+            task.lastReview = new Date();
+            if (grade === 0 || task.nextReviewDate < task.lastReview) {
+                task.nextReviewDate = new Date(); // Review today
             } else if (grade === 1) {
-                // Grade 1: next review is tomorrow
-                nextReviewDate.setDate(today.getDate() + 1);
-                task.nextReview = nextReviewDate.toISOString();
+                task.nextReviewDate = new Date(task.lastReview);
+                task.nextReviewDate.setDate(task.lastReview.getDate() + 1); // Review tomorrow
             } else if (grade === 2) {
-                // Grade 2: increase review interval exponentially
-                let currentInterval = task.interval || 1;
-                nextReviewDate.setDate(today.getDate() + currentInterval);
-                task.nextReview = nextReviewDate.toISOString();
-                task.interval = currentInterval * 2; // Double the interval each time
+                let daysToAdd = 1;
+                for (let i = 0; i < task.grades; i++) {
+                    daysToAdd += 2 * i;
+                }
+                task.nextReviewDate = new Date(task.lastReview);
+                task.nextReviewDate.setDate(task.lastReview.getDate() + daysToAdd); // Review after calculated days
+                task.grades++;
             }
 
             tasks = tasks.map(t => t.text.startsWith(group) && t.text === task.text ? task : t);
@@ -249,7 +246,7 @@
                     // Case for adding multiple tasks
                     let slides = parseInt(parts[1]);
                     let steps = parseInt(parts[2]);
-                    let start = parts[3] ? parseInt(parts[3]) : 1; // Default to 1 if no start is provided
+                    let start = parts[3] ? parseInt(parts[3]) : 1; // Default start value is now 1
                     addMultipleTasks(taskName, slides, steps, start);
                 } else {
                     showMessage('Please enter valid task details.');
@@ -263,7 +260,7 @@
         function addSingleTask(taskName, taskNumber) {
             let tasks = getCookie('tasks');
             tasks = tasks ? JSON.parse(tasks) : [];
-            tasks.push({ text: `${taskName} ${taskNumber}`, nextReview: new Date().toISOString(), interval: 1 });
+            tasks.push({ text: `${taskName} ${taskNumber}`, nextReviewDate: new Date(), grades: 0 });
             setCookie('tasks', JSON.stringify(tasks), 7);
             displayTasks();
         }
@@ -272,15 +269,14 @@
             let tasks = getCookie('tasks');
             tasks = tasks ? JSON.parse(tasks) : [];
             for (let i = start; i <= slides; i += steps) {
-                tasks.push({ text: `${taskName} ${i}`, nextReview: new Date().toISOString(), interval: 1 });
+                tasks.push({ text: `${taskName} ${i}`, nextReviewDate: new Date(), grades: 0 });
             }
             setCookie('tasks', JSON.stringify(tasks), 7);
             displayTasks();
         }
 
         function showMessage(message) {
-            let messageDiv = document.getElementById('message');
-            messageDiv.textContent = message;
+            document.getElementById('message').textContent = message;
         }
 
         document.addEventListener('DOMContentLoaded', displayTasks);
