@@ -20,7 +20,7 @@
             flex-wrap: wrap;
             list-style-type: none;
             padding: 0;
-            width: 100%;
+            width: calc(100% - 40px); /* Adjusted width with padding */
         }
 
         .task-group {
@@ -130,10 +130,16 @@
                 groupedTasks[group].forEach((task, index) => {
                     let taskItem = document.createElement('div');
                     taskItem.className = 'task-item';
+                    
+                    // Ensure nextReviewDate is a valid Date object
+                    let nextReviewDate = task.nextReviewDate ? new Date(task.nextReviewDate) : new Date();
+                    let formattedDate = nextReviewDate.toLocaleDateString();
+                    
                     taskItem.innerHTML = `
-                        ${task.text.split(' ')[1]} ${task.nextReviewDate.toLocaleDateString()} 
+                        ${task.text.split(' ')[1]} ${formattedDate} 
                         <button onclick="showGrades('${group}', ${index})">Review</button>
                         <button onclick="deleteTask('${group}', ${index})">Delete</button>`;
+                    
                     groupContainer.appendChild(taskItem);
                 });
 
@@ -169,19 +175,19 @@
             let task = groupTasks[index];
 
             task.lastReview = new Date();
-            if (grade === 0 || task.nextReviewDate < task.lastReview) {
+            if (grade === 0 || new Date(task.nextReviewDate) < new Date()) {
                 task.nextReviewDate = new Date(); // Review today
             } else if (grade === 1) {
                 task.nextReviewDate = new Date(task.lastReview);
                 task.nextReviewDate.setDate(task.lastReview.getDate() + 1); // Review tomorrow
             } else if (grade === 2) {
                 let daysToAdd = 1;
-                for (let i = 0; i < task.grades; i++) {
+                for (let i = 0; i < (task.grades || 0); i++) {
                     daysToAdd += 2 * i;
                 }
                 task.nextReviewDate = new Date(task.lastReview);
                 task.nextReviewDate.setDate(task.lastReview.getDate() + daysToAdd); // Review after calculated days
-                task.grades++;
+                task.grades = (task.grades || 0) + 1;
             }
 
             tasks = tasks.map(t => t.text.startsWith(group) && t.text === task.text ? task : t);
@@ -238,45 +244,20 @@
             if (newTaskText) {
                 let parts = newTaskText.split(' ');
                 let taskName = parts[0];
-                if (parts.length === 2) {
-                    // Case for adding a single task
-                    let taskNumber = parts[1];
-                    addSingleTask(taskName, taskNumber);
-                } else if (parts.length >= 3) {
-                    // Case for adding multiple tasks
-                    let slides = parseInt(parts[1]);
-                    let steps = parseInt(parts[2]);
-                    let start = parts[3] ? parseInt(parts[3]) : 1; // Default start value is now 1
+                let slides = parseInt(parts[1], 10);
+                let steps = parseInt(parts[2], 10);
+                let start = parseInt(parts[3], 10) || 1;
+
+                if (taskName && !isNaN(slides) && !isNaN(steps)) {
                     addMultipleTasks(taskName, slides, steps, start);
                 } else {
                     showMessage('Please enter valid task details.');
                 }
                 newTaskInput.value = '';
+                toggleAddTaskInput();
             } else {
                 showMessage('Please enter valid task details.');
             }
-        }
-
-        function addSingleTask(taskName, taskNumber) {
-            let tasks = getCookie('tasks');
-            tasks = tasks ? JSON.parse(tasks) : [];
-            tasks.push({ text: `${taskName} ${taskNumber}`, nextReviewDate: new Date(), grades: 0 });
-            setCookie('tasks', JSON.stringify(tasks), 7);
-            displayTasks();
-        }
-
-        function addMultipleTasks(taskName, slides, steps, start) {
-            let tasks = getCookie('tasks');
-            tasks = tasks ? JSON.parse(tasks) : [];
-            for (let i = start; i <= slides; i += steps) {
-                tasks.push({ text: `${taskName} ${i}`, nextReviewDate: new Date(), grades: 0 });
-            }
-            setCookie('tasks', JSON.stringify(tasks), 7);
-            displayTasks();
-        }
-
-        function showMessage(message) {
-            document.getElementById('message').textContent = message;
         }
 
         document.addEventListener('DOMContentLoaded', displayTasks);
