@@ -13,7 +13,7 @@
                 const hour = now.getHours();
 
                 // Define the URLs to open for each condition
-                const urls = {
+                const urls = { // still checking if these websites are any good
                     friday: [
                         'https://www.reddit.com/r/sehnsuchtpics/top/?t=week',
                         'https://en.wikipedia.org/wiki/Portal:Current_events',
@@ -47,6 +47,12 @@
                         'https://www.ardalpha.de/wissen/ard-alpha-wissen-rss-feed-100.html',
                         'https://news.ycombinator.com/',
                         'https://www.visualcapitalist.com/'
+                    ],
+                    sunday: [
+                        'https://www.3sat.de/wissen/nano',
+                        'https://www.statista.com/news',
+                        'https://theconversation.com/europe/topics/statistics-1430',
+                        'https://www.extremetech.com/category/science',
                     ]
                 };
 
@@ -62,8 +68,15 @@
                     urls.saturday.forEach(url => {
                         window.open(url, '_blank');
                     });
-                     window.close();
-                } else {
+                    window.close();
+                }
+                else if (day === 0) {
+                     urls.sunday.forEach(url => {
+                        window.open(url, '_blank');
+                    });
+                    window.close();
+                }
+                else {
                     // Close the page or make it blank
                     window.close();
                     document.body.innerHTML = '<h1>This page is not active now.</h1>';
