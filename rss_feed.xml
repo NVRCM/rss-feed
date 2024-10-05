@@ -5,16 +5,16 @@
     <link>http://www.example.com</link>
     <description>Still in Progess. Most Links are porbably useless. My own weekend newspaper. Other feeds not listed here are directly subscribed. TODO maybe use a multiple link opener</description>
     <language>en-us</language>
-    <lastBuildDate>Fri, 04 Oct 2024 00:54:05 GMT</lastBuildDate>
-    <pubDate>Fri, 04 Oct 2024 00:54:05 GMT</pubDate>
+    <lastBuildDate>Sat, 05 Oct 2024 00:53:30 GMT</lastBuildDate>
+    <pubDate>Sat, 05 Oct 2024 00:53:30 GMT</pubDate>
     <ttl>1440</ttl>
     
     <item>
       <title>Weekly</title>
       <link>https://nvrcm.github.io/rss-feed/LinkOpener.html</link>
       <description></description>
-      <pubDate>Fri, 04 Oct 2024 00:54:05 GMT</pubDate>
-      <guid>https://nvrcm.github.io/rss-feed/LinkOpener.html20241004</guid>
+      <pubDate>Sat, 05 Oct 2024 00:53:30 GMT</pubDate>
+      <guid>https://nvrcm.github.io/rss-feed/LinkOpener.html20241005</guid>
     </item>
     
   </channel>
